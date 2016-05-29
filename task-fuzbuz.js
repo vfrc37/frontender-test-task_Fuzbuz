@@ -22,21 +22,10 @@ console.clear();
         
         // поиск всех вхождений
         while ((index = s.indexOf(substr, index + 1)) != -1) {
-//        while (index != s.length) {
-            index = index + substr.length;
-//            index++;
             count++;
         }
-        
-//        while (true) {
-//          var foundPos = str.indexOf(target, pos);
-//          if (foundPos == -1) break;
-//
-//          alert( foundPos ); // нашли на этой позиции
-//          pos = foundPos + 1; // продолжить поиск со следующей
-//        }
 
-        return s;
+        return count;
 
     }
 //            Ваш код реализации функции dscount
