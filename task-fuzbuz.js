@@ -21,7 +21,7 @@ console.clear();
         var index = -1;
         
         // поиск всех вхождений
-        while ((index = s.indexOf(substr, index + 1)) != -1) {
+        while ((index = s.indexOf(substr, index + substr.length)) != -1) {
 //        while (index != s.length) {
             
 //            index++;
