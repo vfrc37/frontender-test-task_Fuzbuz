@@ -1,10 +1,13 @@
-# Solutions of tasks: Fuzbuz and 
-see js code
+# Solutions of tasks: Fuzbuz and
+================================
 
-# Fuzbuz 
-task here 
+# Fuzbuz
+========
+
+task here
+----------
 https://github.com/frontdevops/frontend-javascript-test
 
-see solution in
-task-fuzbuz.js
+see solution in task-fuzbuz.js
+----------
 https://github.com/vfrc37/frontender-test-task_Fuzbuz/blob/master/task-fuzbuz.js
