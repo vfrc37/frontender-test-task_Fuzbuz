@@ -3,8 +3,7 @@ console.clear();
 
 (w => {
     // Yor code here ...
-
-    var s = 'AB___ab__';
+//    Ваш код реализации функции dscount
 
     function dscount(str, symbolA, symbolB) {
 
@@ -16,8 +15,7 @@ console.clear();
         var a = symbolA.toLowerCase();
         var b = symbolB.toLowerCase();
         
-        var substr = a + b;
-        
+        var substr = a + b;        
         
         // поиск всех вхождений
         var index = -1;
@@ -29,12 +27,7 @@ console.clear();
         return count;
 
     }
-//            Ваш код реализации функции dscount
     // ... //
-
-    var strlow = dscount(s, 'a', 'b');
-//            console.log('str : ' + dscount('ab___ab__', 'a', 'b'));
-
 
     // Для удобства можно использовать эти тесты:
     try {
