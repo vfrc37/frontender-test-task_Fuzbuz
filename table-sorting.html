@@ -89,10 +89,10 @@
 //    var small = $('#small');
 //    var big   = $('#big');
     
-    $('#small')[0].onclick = startLoading;
-//    $('#small').bind('click', startLoading);
-//    $('#big').bind('click', startLoading);
-    $('#big')[0].onclick = startLoading;
+//    $('#small')[0].onclick = startLoading;
+    $('#small').bind('click', startLoading);
+    $('#big').bind('click', startLoading);
+//    $('#big')[0].onclick = startLoading;
 //    small.onclick = startLoading;
 //    big.onclick   = startLoading;
     
@@ -119,11 +119,12 @@
         }
         
         $.getJSON(url, function(data) {
-//                console.log('data.length : ' + data.length);
-//                console.log('data[0] : ' + data[0]);
 
-//                var mail = d[0].adress.city;
             dataObject = data;
+            
+            console.log('data.length : ' + data.length);
+            console.log('data[0] : ' + data[0]);
+            var mail = data[0].adress.city;            
             
             // скрываем анимацию загрузки
             setTimeout(function () {
