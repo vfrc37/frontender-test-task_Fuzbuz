@@ -9,6 +9,7 @@ console.clear();
     function dscount(str, symbolA, symbolB) {
 
         // функция dscount возвращает число идущих подряд символов symbolA и symbolB в строке str, без учёта регистра
+        var count = 0;
 
         // сбрасываем входные строки в нижний регистр (регистр не должен учитываться)
         var s = str.toLowerCase();
@@ -16,7 +17,6 @@ console.clear();
         var b = symbolB.toLowerCase();
         
         var substr = a + b;
-        var count = 0;
         
         var index = -1;
         
