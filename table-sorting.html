@@ -3,8 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <title>Сортировка таблицы</title>
+    <style>
+    
+        * {
+    /*        margin: 0;*/
+    /*        padding: 0;*/
+/*            box-sizing: border-box;*/
+        }
+        
+        #wrapper {
+            
+            position: relative;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 800px;
+/*            margin-top: -400px;*/
+            margin-left: -400px;
+            border: 1px solid #000;
+            text-align: center;
+        }
+        
+        p {
+            line-height: 80px;
+            font-size: 40px;
+        }
+        
+        #loader {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            height: 150px;
+            width: 150px;
+            margin-top: -75px;
+            margin-left: -75px;
+/*            border: 1px solid #000;*/
+            border-radius: 75px;
+            box-shadow: 0 0 10px 5px #656565;
+            z-index: 1;
+        }
+        
+        .button-choose_loading {
+            display: inline-block;
+            margin: 20px;
+            padding: 20px;
+        }
+       
+        
+    
+    </style>
+    
+    <link rel="stylesheet" href="loader.css">
+    
+    <script type="text/javascript" src="jquery-1.12.0.min.js"></script>
 </head>
 <body>
+    <div id="wrapper">
+        <div id="loader">
+        <!--    taken from http://cssload.net#sthash.iNaN8lKs.dpuf-->
+            <div id="floatingBarsG">
+                <div class="blockG" id="rotateG_01"></div>
+                <div class="blockG" id="rotateG_02"></div>
+                <div class="blockG" id="rotateG_03"></div>
+                <div class="blockG" id="rotateG_04"></div>
+                <div class="blockG" id="rotateG_05"></div>
+                <div class="blockG" id="rotateG_06"></div>
+                <div class="blockG" id="rotateG_07"></div>
+                <div class="blockG" id="rotateG_08"></div>
+            </div>
+
+        </div>
+        <p>Выберите объем загружаемых данных</p>
+        <div id="buttons">
+            <button id="small" class='button-choose_loading'>Мало данных</button>
+            <button id="big" class='button-choose_loading'>Много данных</button>
+        </div>        
+        
+    </div>
+
     
+
+<script>
+    
+//    var small = $('#small');
+//    var big   = $('#big');
+    
+    $('#small')[0].onclick = startLoading;
+//    $('#small').bind('click', startLoading);
+//    $('#big').bind('click', startLoading);
+    $('#big')[0].onclick = startLoading;
+//    small.onclick = startLoading;
+//    big.onclick   = startLoading;
+    
+    var url = ''; // источник данных для загрузки
+//    var dataObject = function(url) {}    
+    var dataObject = [];
+    
+    
+    function startLoading() {
+        
+        // показываем анимацию загрузки
+        displayLoader(true);
+        
+        // определяем вариант загрузки
+        switch (this.id) {
+                
+            case 'small' :
+                url = 'http://www.filltext.com/?rows=32&id=%7Bnumber%7C1000%7D&firstName=%7BfirstName%7D&lastName=%7BlastName%7D&email=%7Bemail%7D&phone=%7Bphone%7C(xxx)xxx-xx-xx%7D&adress=%7BaddressObject%7D&description=%7Blorem%7C32%7D';
+                break;
+                
+            case 'big' :
+                url = 'http://www.filltext.com/?rows=1000&id=%7Bnumber%7C1000%7D&firstName=%7BfirstName%7D&delay=3&lastName=%7BlastName%7D&email=%7Bemail%7D&phone=%7Bphone%7C(xxx)xxx-xx-xx%7D&adress=%7BaddressObject%7D&description=%7Blorem%7C32%7D';
+                break;                
+        }
+        
+        $.getJSON(url, function(data) {
+//                console.log('data.length : ' + data.length);
+//                console.log('data[0] : ' + data[0]);
+
+//                var mail = d[0].adress.city;
+            dataObject = data;
+            
+            // скрываем анимацию загрузки
+            setTimeout(function () {
+                displayLoader(false);
+            }, 1000); // 1000 ms - минимальное время анимации
+            
+        });
+        
+        function displayLoader(flag) {            
+            (flag) ? $('#loader')[0].style.display = 'block' : $('#loader')[0].style.display = 'none';
+        }
+        
+    }
+    
+
+    
+
+    
+</script>    
 </body>
 </html>
