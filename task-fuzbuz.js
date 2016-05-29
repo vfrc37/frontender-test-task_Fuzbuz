@@ -18,9 +18,10 @@ console.clear();
         
         var substr = a + b;
         
-        var index = -1;
         
         // поиск всех вхождений
+        var index = -1;
+        
         while ((index = s.indexOf(substr, index + 1)) != -1) {
             count++;
         }
