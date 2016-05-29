@@ -25,8 +25,8 @@ console.clear();
         }
 
         return count;
-
-    }
+    }    
+    
     // ... //
 
     // Для удобства можно использовать эти тесты:
@@ -38,7 +38,7 @@ console.clear();
         test(dscount, ['_ba______', 'a', 'b'], 0);
         test(dscount, ['_a__b____', 'a', 'b'], 0);
         test(dscount, ['-ab-аb-ab', 'a', 'b'], 2);
-
+        // P.S. в последнем тесте опечатка :)
         console.info("Congratulations! All tests success passed.");
     } catch(e) {
         console.error(e);
