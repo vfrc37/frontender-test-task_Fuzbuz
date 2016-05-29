@@ -14,7 +14,27 @@ console.clear();
         var s = str.toLowerCase();
         var a = symbolA.toLowerCase();
         var b = symbolB.toLowerCase();
-
+        
+        var substr = a + b;
+        var count = 0;
+        
+        var index = -1;
+        
+        // поиск всех вхождений
+        while ((index = s.indexOf(substr, index + 1)) != -1) {
+//        while (index != s.length) {
+            
+//            index++;
+            count++;
+        }
+        
+//        while (true) {
+//          var foundPos = str.indexOf(target, pos);
+//          if (foundPos == -1) break;
+//
+//          alert( foundPos ); // нашли на этой позиции
+//          pos = foundPos + 1; // продолжить поиск со следующей
+//        }
 
         return s;
 
