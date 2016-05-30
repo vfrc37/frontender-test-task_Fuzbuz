@@ -93,6 +93,17 @@
             background-color: #CEDBFF;
 /*            cursor: pointer;*/
         }
+        tr.top-row td:hover {
+            background-color: #a9c0ff;
+        }
+        
+        tr.top-row:hover td {
+/*            background-color: #CEDBFF;*/
+        }
+        
+        tr:not(.top-row):hover td {
+            background-color: #a2a2a2;
+        }
         
         tr.top-row td {
             border: 1px solid #8BAAFF;
@@ -101,7 +112,7 @@
         }
         
         tr td {
-            border: 1px solid #8d8d8d;
+            border: 1px solid #bababa;
             text-align: left;
             padding-left: 15px;
         }
@@ -123,8 +134,11 @@
         }
 /*        button {background-color: #dbdbdb;}*/
         button:focus {outline: none;}
-        div.nav-buttons:hover {background-color: #8d8d8d; transition: background-color .5s;}
+        div.nav-buttons:hover {background-color: #8d8d8d;}
         
+        .smooth-hover, tr.smooth-hover td {
+            transition: background-color .3s;
+        }
     
     </style>
     
@@ -149,8 +163,8 @@
 
         </div>
         <p id='title'>Выберите объем загружаемых данных</p>
-        <div id="top-prev" class='nav-buttons'>&#9665;</div>
-        <div id="top-next" class='nav-buttons'>&#9655;</div>
+        <div id="top-prev" class='nav-buttons smooth-hover'>&#9665;</div>
+        <div id="top-next" class='nav-buttons smooth-hover'>&#9655;</div>
         <div id="buttons">
             <button id="small" class='button-choose_loading'>Мало данных</button>
             <button id="big" class='button-choose_loading'>Много данных</button>
@@ -169,8 +183,8 @@
             </tr>                    
 -->
         </table>
-        <div id="bottom-prev" class='nav-buttons'>&#9665;</div>
-        <div id="bottom-next" class='nav-buttons'>&#9655;</div>        
+        <div id="bottom-prev" class='nav-buttons smooth-hover'>&#9665;</div>
+        <div id="bottom-next" class='nav-buttons smooth-hover'>&#9655;</div>        
         
     </div>
 
@@ -230,7 +244,7 @@
         table.display(false);
         
         // создаем верхнюю строку
-        table.addNewRow('top-row');        
+        table.addNewRow('top-row smooth-hover');        
         
         // заполняем верхнюю строку        
         var colNames = [];
@@ -247,26 +261,28 @@
             con('данные получены');
             contacts = data.slice(); // копия загруженных данных
             
-            console.log('contacts.length : ' + contacts.length);
-            console.log('contacts[0] : ' + contacts[0]);
-            var mail = contacts[0].adress.city;
+//            console.log('contacts.length : ' + contacts.length);
+//            console.log('contacts[0] : ' + contacts[0]);
+//            var mail = contacts[0].adress.city;
             
             sortCollection(contacts, 'id');
+//            check(contacts, 'id');
+            
 //            con('contacts : ' + contacts);
             
             
             var l = data.length;
             
-//            if (l <= rowMax) {
+            if (l <= rowMax) {
                 
                 fillRows(table, contacts, l);
                 con('контактов : ' + l + ' не больше ' + rowMax + ', навигация по страницам не нужна');
                 
-//            } else {
-//                
-//                fillRows(table, contacts, rowMax);
-//                con('контактов : ' + l + ' больше ' + rowMax + ', делаю навигацию по страницам');
-//            }
+            } else {
+                
+                fillRows(table, contacts, rowMax);
+                con('контактов : ' + l + ' больше ' + rowMax + ', делаю навигацию по страницам');
+            }
             
             
 
@@ -442,23 +458,7 @@
 //        if (parameter === 'id') {
             collection.sort(compare);
             
-//            for (var i = 0; i < collection.length; i++) {
-//                
-//                var arr = [];
-//                
-//                function sortSame() {
-//                    
-//                }
-//                
-//                while (collection[i + 1][parameter] == collection[i][parameter]) {
-//                    
-//                    arr.push(collection[i]);
-//                    con('i : ' + i + ', col[i] : ' + collection[i][parameter]);
-//                    i++;
-//                }
-//                
-//                con('arr : ' + arr);
-//            }
+
 //            collection.sort(compareStrings);
 //        } else {
 //            collection.sort(compareStrings);
@@ -479,8 +479,8 @@
             } else {
                 return a[parameter] - b[parameter];
             }
-
-        }
+        }        
+        
         
 //        function compareNumber(a, b) {
 //            var c = a;
@@ -505,6 +505,34 @@
 //        }
 //        
 //        arr.sort();
+    }
+    
+    function check(collection, parameter) {
+        
+        for (var i = 0; i < collection.length; i++) {
+
+            var arr = [];
+//            var paramIndex = 0;
+            
+            function sortSameData(collection, parameter) {
+                
+                while (collection[i + 1][parameter] == collection[i][parameter]) {
+
+                    arr.push(collection[i]);
+                    con('i : ' + i + ', col[i] : ' + collection[i][parameter]);
+                    i++;
+                }
+
+                for (var j = 0; j < columns.length; j++) {
+//                        var param = columns[j].id;
+                    if (columns[j].id == parameter) continue;
+                    sortCollection(arr, columns[j].id);
+//                    sortSameData(arr, );
+
+                }
+            }
+//            con('arr : ' + arr);
+        }        
     }
     
 //    function Contact() {
