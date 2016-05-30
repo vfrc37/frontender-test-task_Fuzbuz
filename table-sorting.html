@@ -64,6 +64,7 @@
         
         tr {
             height: 40px;
+            cursor: pointer;
         }
         
         td {
@@ -90,6 +91,7 @@
         tr.top-row {
             height: 60px;
             background-color: #CEDBFF;
+/*            cursor: pointer;*/
         }
         
         tr.top-row td {
@@ -249,18 +251,22 @@
             console.log('contacts[0] : ' + contacts[0]);
             var mail = contacts[0].adress.city;
             
+            sortCollection(contacts, 'id');
+//            con('contacts : ' + contacts);
+            
+            
             var l = data.length;
             
-            if (l <= rowMax) {
+//            if (l <= rowMax) {
                 
                 fillRows(table, contacts, l);
                 con('контактов : ' + l + ' не больше ' + rowMax + ', навигация по страницам не нужна');
                 
-            } else {
-                
-                fillRows(table, contacts, rowMax);
-                con('контактов : ' + l + ' больше ' + rowMax + ', делаю навигацию по страницам');
-            }
+//            } else {
+//                
+//                fillRows(table, contacts, rowMax);
+//                con('контактов : ' + l + ' больше ' + rowMax + ', делаю навигацию по страницам');
+//            }
             
             
 
@@ -431,8 +437,74 @@
 //        }
     }
     
-    function sortArray() {
+    function sortCollection(collection, parameter) {
         
+//        if (parameter === 'id') {
+            collection.sort(compare);
+            
+//            for (var i = 0; i < collection.length; i++) {
+//                
+//                var arr = [];
+//                
+//                function sortSame() {
+//                    
+//                }
+//                
+//                while (collection[i + 1][parameter] == collection[i][parameter]) {
+//                    
+//                    arr.push(collection[i]);
+//                    con('i : ' + i + ', col[i] : ' + collection[i][parameter]);
+//                    i++;
+//                }
+//                
+//                con('arr : ' + arr);
+//            }
+//            collection.sort(compareStrings);
+//        } else {
+//            collection.sort(compareStrings);
+//        }
+        
+        // функция сравнения
+        function compareStrings(a, b) {
+//            var c = a;
+//            var d = b;
+            return a[parameter] - b[parameter];
+        }
+        
+        function compare(a, b) {
+            if (parameter === 'id') {
+//                if (a[parameter] == b[parameter]) con('aaa');
+                if (a[parameter] > b[parameter]) return 1;
+                if (a[parameter] < b[parameter]) return -1;                
+            } else {
+                return a[parameter] - b[parameter];
+            }
+
+        }
+        
+//        function compareNumber(a, b) {
+//            var c = a;
+//            var d = b;
+//            return a[parameter] - b[parameter];
+//        }        
+        
+        
+
+//        // проверка
+//        var vasya = { name: "Вася", age: 23 };
+//        var masha = { name: "Маша", age: 18 };
+//        var vovochka = { name: "Вовочка", age: 6 };
+//
+//        var people = [ vasya , masha , vovochka ];
+//
+//        people.sort(compareAge);
+//
+//        // вывести
+//        for(var i = 0; i < people.length; i++) {
+//          alert(people[i].name); // Вовочка Маша Вася
+//        }
+//        
+//        arr.sort();
     }
     
 //    function Contact() {
