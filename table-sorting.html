@@ -105,6 +105,7 @@
         
         // показываем анимацию загрузки
         displayLoader(true);
+        con('начало загрузки данных с сервера, показ анимации');
         
         // определяем вариант загрузки
         switch (this.id) {
@@ -119,7 +120,8 @@
         }
         
         $.getJSON(url, function(data) {
-
+            
+            con('данные получены');
             dataObject = data;
             
             console.log('data.length : ' + data.length);
@@ -127,6 +129,8 @@
             var mail = data[0].adress.city;            
             
             // скрываем анимацию загрузки
+            con('скрываю анимацию');
+//            displayLoader(false); // вариант без минимальной задержки
             setTimeout(function () {
                 displayLoader(false);
             }, 1000); // 1000 ms - минимальное время анимации
@@ -137,6 +141,11 @@
             (flag) ? $('#loader')[0].style.display = 'block' : $('#loader')[0].style.display = 'none';
         }
         
+    }
+    
+    // вывод информации о ходе выполнения программы
+    function con(msg) {
+        console.log(msg);
     }
     
 
