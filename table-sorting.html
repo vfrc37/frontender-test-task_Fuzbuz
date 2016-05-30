@@ -17,7 +17,7 @@
             top: 50%;
             left: 50%;
             width: 800px;
-            height: 800px;
+            min-height: 800px;
 /*            margin-top: -400px;*/
             margin-left: -400px;
             border: 1px solid #000;
@@ -49,7 +49,45 @@
             margin: 20px;
             padding: 20px;
         }
-       
+        
+        #table {
+/*            display: none;*/
+/*            height: 400px;*/
+/*            width: 700px;*/
+            margin: 50px auto;
+            border: 1px solid #000;
+            box-sizing: border-box;
+        }
+        
+        tr {
+            height: 40px;
+        }
+        
+        td {
+/*            width: 60px;*/
+/*            height: 40px;*/
+        }
+        
+        td.small-col {
+            width: 40px;
+        }
+        
+        td.normal-col {
+            width: 100px;
+        }
+        
+        td.big-col {
+            width: 160px;
+        }
+        
+        tr#top-row {
+            height: 60px;
+            background-color: #CEDBFF;
+        }
+        
+        tr#top-row td {
+            border: 1px solid #8BAAFF;
+        }
         
     
     </style>
@@ -78,7 +116,16 @@
         <div id="buttons">
             <button id="small" class='button-choose_loading'>Мало данных</button>
             <button id="big" class='button-choose_loading'>Много данных</button>
-        </div>        
+        </div>
+        <table id='table' cellpadding="0" cellspacing="0">
+            <tr id='top-row'>
+                <td class='small-col'>id <span>&uarr;</span></td>
+                <td class='normal-col'>firstName <span>&darr;</span></td>
+                <td class='normal-col'>lastName <span>&#9650;</span></td>
+                <td class='normal-col'>email <span>&#9660;</span></td>
+                <td class='big-col'>phone <span>&uarr;</span></td>                
+            </tr>                    
+        </table>
         
     </div>
 
@@ -126,7 +173,7 @@
             
             console.log('data.length : ' + data.length);
             console.log('data[0] : ' + data[0]);
-            var mail = data[0].adress.city;            
+            var mail = dataObject[0].adress.city;            
             
             // скрываем анимацию загрузки
             con('скрываю анимацию');
@@ -137,16 +184,26 @@
             
         });
         
-        function displayLoader(flag) {            
+        function displayLoader(flag) {
             (flag) ? $('#loader')[0].style.display = 'block' : $('#loader')[0].style.display = 'none';
         }
         
     }
     
+    function Table(tblId, colSort) {
+        this.table = $('#' + tblId);
+    }
+    
+//    function Contact() {
+//        this.name = 
+//    }
+    
     // вывод информации о ходе выполнения программы
     function con(msg) {
         console.log(msg);
     }
+    
+
     
 
     
