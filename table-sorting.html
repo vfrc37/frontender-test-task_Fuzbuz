@@ -25,7 +25,7 @@
             text-align: center;
         }
         
-        p {
+        p#title {
             line-height: 80px;
             font-size: 40px;
         }
@@ -81,6 +81,10 @@
             width: 180px;
         }
         
+        td.large-col {
+            width: 220px;
+        }
+        
         tr.top-row {
             height: 60px;
             background-color: #CEDBFF;
@@ -88,10 +92,13 @@
         
         tr.top-row td {
             border: 1px solid #8BAAFF;
+            text-align: center;
         }
         
         tr td {
             border: 1px solid #8d8d8d;
+            text-align: left;
+            padding-left: 15px;
         }
         
     
@@ -117,7 +124,7 @@
             </div>
 
         </div>
-        <p>Выберите объем загружаемых данных</p>
+        <p id='title'>Выберите объем загружаемых данных</p>
         <div id="buttons">
             <button id="small" class='button-choose_loading'>Мало данных</button>
             <button id="big" class='button-choose_loading'>Много данных</button>
@@ -154,10 +161,15 @@
 //    var dataObject = function(url) {}    
     var dataObject = [];
     
+    var rowMax = 20;
+    
     
     function startLoading() {
         
         // показываем анимацию загрузки
+        $('#small')[0].style.display = 'none';
+        $('#big')[0].style.display = 'none';
+        $('#title')[0].style.display = 'none';
         displayLoader(true);
         con('начало загрузки данных с сервера, показ анимации');
         
@@ -176,7 +188,7 @@
         // новая таблица
         var tblId = 'table';
         var colNames = ['id', 'firstName', 'lastName', 'email', 'phone'];
-        var colClasses = ['small-col', 'normal-col', 'normal-col', 'big-col', 'big-col'];
+        var colClasses = ['small-col', 'normal-col', 'normal-col', 'large-col', 'big-col'];
 //        colClasses = [];
 
 //            var topRowClasses = [];
@@ -196,18 +208,33 @@
             console.log('data[0] : ' + data[0]);
             var mail = dataObject[0].adress.city;
             
-            for (var i = 0; i < data.length; i++) {
-                table.addNewRow('');
-                var colData = [];
+            var l = data.length;
+            
+            if (l <= rowMax) {
                 
-                colData.push(data[i].id);
-                colData.push(data[i].firstName);
-                colData.push(data[i].lastName);
-                colData.push(data[i].email);
-                colData.push(data[i].phone);
-                
-                table.fillRowData(i+1, colData);
+                fillRows(table, data, l);
+                con('контактов : ' + l + ' не больше ' + rowMax + ', навигация по страницам не нужна');
+            } else {
+                fillRows(table, data, rowMax);
+                con('контактов : ' + l + ' больше ' + rowMax + ', делаю навигацию по страницам');
             }
+            
+            function fillRows(table, data, rowsNumber) {
+                
+                for (var i = 0; i < rowsNumber; i++) {
+                    table.addNewRow('');
+                    var colData = [];
+
+                    colData.push(data[i].id);
+                    colData.push(data[i].firstName);
+                    colData.push(data[i].lastName);
+                    colData.push(data[i].email);
+                    colData.push(data[i].phone);
+
+                    table.fillRowData(i+1, colData);
+                }                
+            }
+
             
             // скрываем анимацию загрузки
             con('скрываю анимацию');
