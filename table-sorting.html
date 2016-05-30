@@ -118,6 +118,7 @@
             <button id="big" class='button-choose_loading'>Много данных</button>
         </div>
         <table id='table' cellpadding="0" cellspacing="0">
+<!--
             <tr class='top-row'>
                 <td class='small-col'>id <span>&uarr;</span></td>
                 <td class='normal-col'>firstName <span>&darr;</span></td>
@@ -125,6 +126,7 @@
                 <td class='normal-col'>email <span>&#9660;</span></td>
                 <td class='big-col'>phone <span>&uarr;</span></td>                
             </tr>                    
+-->
         </table>
         
     </div>
@@ -185,11 +187,12 @@
             // новая таблица
             var tblId = 'table';
             var colNames = ['id', 'firstName', 'lastName', 'email', 'phone'];
-            var topRowClasses = [];
-            var rowClasses = [];
-            var colClasses = ['small-col', 'normal-col', ];
+            var colClasses = ['small-col', 'normal-col', 'normal-col', 'normal-col', 'big-col'];
+
+//            var topRowClasses = [];
+//            var rowClasses = [];
             
-            var table = new Table(tblId, colNames, topRowClasses, rowClasses, colClasses);
+            var table = new Table(tblId, colNames, colClasses);
             table.addNewRow('top-row');
         });
         
@@ -199,11 +202,11 @@
         
     }
     
-    function Table(tblId, colNames, topRowClasses, rowClasses, lClasses) {
+    function Table(tblId, colNames, colClasses) {
         this.table = $('#' + tblId);
         
         this.rows = [];
-        this.colNames = colNames;
+//        this.colNames = colNames;
         
 //        this.col = {
 //            index : 0,
@@ -215,6 +218,7 @@
 //            classes : [],
 //            top : false
 //        };
+//        var table = $('#' + tblId)
         
         this.addNewRow = function(className) {
             
@@ -222,7 +226,18 @@
             if (className) row.className = className;
             this.table.appendChild(row);
             
-        };        
+            for (var i = 0; i < colNames.length; i++) {
+                var cell = document.createElement('td');
+                cell.className = colClasses[i];
+                cell.innerHTML = colNames[i];
+                row(cell);
+            }
+            
+        };
+        
+        this.addNewCol = function(name, className) {
+            var row = document.createElement('tr');
+        }
         
 //        this.createCell = function(name, index, cellClasses) {
 //            
