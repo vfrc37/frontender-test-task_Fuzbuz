@@ -51,7 +51,7 @@
         }
         
         #table {
-/*            display: none;*/
+            display: none;
 /*            height: 400px;*/
 /*            width: 700px;*/
             margin: 50px auto;
@@ -168,6 +168,19 @@
                 break;                
         }
         
+        // новая таблица
+        var tblId = 'table';
+        var colNames = ['id', 'firstName', 'lastName', 'email', 'phone'];
+        var colClasses = ['small-col', 'normal-col', 'normal-col', 'normal-col', 'big-col'];
+
+//            var topRowClasses = [];
+//            var rowClasses = [];
+
+        var table = new Table(tblId, colNames, colClasses);
+        table.display(false);
+        table.addNewRow('top-row');
+        
+        
         $.getJSON(url, function(data) {
             
             con('данные получены');
@@ -180,20 +193,14 @@
             // скрываем анимацию загрузки
             con('скрываю анимацию');
 //            displayLoader(false); // вариант без минимальной задержки
+//            table.display(true);
             setTimeout(function () {
                 displayLoader(false);
+                table.display(true);
             }, 1000); // 1000 ms - минимальное время анимации
             
-            // новая таблица
-            var tblId = 'table';
-            var colNames = ['id', 'firstName', 'lastName', 'email', 'phone'];
-            var colClasses = ['small-col', 'normal-col', 'normal-col', 'normal-col', 'big-col'];
-
-//            var topRowClasses = [];
-//            var rowClasses = [];
             
-            var table = new Table(tblId, colNames, colClasses);
-            table.addNewRow('top-row');
+
         });
         
         function displayLoader(flag) {
@@ -203,7 +210,7 @@
     }
     
     function Table(tblId, colNames, colClasses) {
-        this.table = $('#' + tblId);
+        this.table = $('#' + tblId)[0];
         
         this.rows = [];
 //        this.colNames = colNames;
@@ -220,18 +227,32 @@
 //        };
 //        var table = $('#' + tblId)
         
+        this.setWidth = function(w) {
+            if (w) this.table.style.width = w + 'px';
+        }
+        
+        this.display = function(flag) {
+            (flag) ? this.table.style.display = 'block' : this.table.style.display = 'none';
+        }        
+        
         this.addNewRow = function(className) {
             
+            var self = this;
             var row = document.createElement('tr');
             if (className) row.className = className;
-            this.table.appendChild(row);
+            self.table.appendChild(row);
+            
+            var w = 0;
             
             for (var i = 0; i < colNames.length; i++) {
                 var cell = document.createElement('td');
                 cell.className = colClasses[i];
                 cell.innerHTML = colNames[i];
-                row(cell);
+                row.appendChild(cell);
+                w += parseFloat(getComputedStyle(cell).width);
             }
+            
+            self.setWidth(w);
             
         };
         
