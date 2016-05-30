@@ -37,11 +37,11 @@ function startLoading() {
 
     // параметры столбцов
     var columns = [];        
-    columns.push(new Column('id'       , 'small-col' , ' <span>&#9650;</span>'));
-    columns.push(new Column('firstName', 'normal-col', ' <span>&#9650;</span>'));
-    columns.push(new Column('lastName' , 'normal-col', ' <span>&#9650;</span>'));
-    columns.push(new Column('email'    , 'large-col' , ' <span>&#9650;</span>'));
-    columns.push(new Column('phone'    , 'big-col'   , ' <span>&#9650;</span>'));
+    columns.push(new Column('id'       , 'small-col' , ' <span>&#9650;</span>', true));
+    columns.push(new Column('firstName', 'normal-col', ' <span>&#9650;</span>', true));
+    columns.push(new Column('lastName' , 'normal-col', ' <span>&#9650;</span>', true));
+    columns.push(new Column('email'    , 'large-col' , ' <span>&#9650;</span>', true));
+    columns.push(new Column('phone'    , 'big-col'   , ' <span>&#9650;</span>', true));
 
     // новая таблица
     var tblId = 'table';        
@@ -70,18 +70,8 @@ function startLoading() {
         con('коллекцию контактов отсортирована по параметру : ' + 'id');
                 
         // выводим информацию о контактах в таблицу
-        var l = data.length;
-
-        if (l <= rowMax) {
-
-            fillRows(table, contacts, l);
-            con('контактов : ' + l + ' не больше ' + rowMax + ', навигация по страницам не нужна');
-
-        } else {
-
-            fillRows(table, contacts, rowMax);
-            con('контактов : ' + l + ' больше ' + rowMax + ', делаю навигацию по страницам');
-        }
+//        fillTable(table, contacts, 1);
+        table.fulfill(contacts, 1);
 
         // скрываем анимацию загрузки
         con('скрываю анимацию');
@@ -90,33 +80,48 @@ function startLoading() {
         setTimeout(function () {
             displayLoader(false);
             table.display(true);
-            showNavigationButtons(page, rowMax, l);
+            showNavigationButtons(page, rowMax, contacts.length);
         }, 500); // 500 ms - минимальное время анимации
     });
 }
 
-function fillRows(table, data, rowsNumber) {
-
-    for (var i = 0; i < rowsNumber; i++) {
-        table.addNewRow('');
-        var colData = [];
-        
-        var table;
-        
-        for (var j = 0; j < table.columns.length; j++) {
-            table.columns[j];
-            colData.push(data[i][table.columns[j].name]);
-        }
-        
-//        colData.push(data[i].id);
-//        colData.push(data[i].firstName);
-//        colData.push(data[i].lastName);
-//        colData.push(data[i].email);
-//        colData.push(data[i].phone);
-
-        table.fillRowData(i+1, colData, 0);
-    }                
-}
+//function fillTable(table, contacts, createFlag) {
+//    
+//    var length = contacts.length;
+//    
+//    if (length <= rowMax) {
+//
+//        fillRows(table, contacts, length);
+//        con('контактов : ' + length + ' не больше ' + rowMax + ', навигация по страницам не нужна');
+//
+//    } else {
+//
+//        fillRows(table, contacts, rowMax);
+//        con('контактов : ' + length + ' больше ' + rowMax + ', делаю навигацию по страницам');
+//    }
+//    
+//    function fillRows(table, data, rowsNumber) {
+//
+//        for (var i = 0; i < rowsNumber; i++) {
+//            if (createFlag) table.addNewRow('');
+//            var colData = [];
+//
+//            var table;
+//
+//            for (var j = 0; j < table.columns.length; j++) {
+//                table.columns[j];
+//                colData.push(data[i][table.columns[j].name]);
+//            }        
+//    //        colData.push(data[i].id);
+//    //        colData.push(data[i].firstName);
+//    //        colData.push(data[i].lastName);
+//    //        colData.push(data[i].email);
+//    //        colData.push(data[i].phone);
+//
+//            table.fillRowData(i+1, colData, 0);
+//        }                
+//    }    
+//}
 
 function displayLoader(flag) {
     // показать/скрыть анимацию загрузки данных    
@@ -155,7 +160,7 @@ function Table(tblId, columns) {
 
     this.display = function(flag) {
         (flag) ? this.table.style.display = 'block' : this.table.style.display = 'none';
-    }        
+    }
 
     this.addNewRow = function(rowClassName) {
 
@@ -178,56 +183,113 @@ function Table(tblId, columns) {
         self.setWidth(w);
     };
 
-    this.fillRowData = function(rowIndex, array, eventFlag) {
-        
+    this.fillRowData = function(rowIndex, array, topFlag) {
+        // topFlag : 1 - верхняя строка, 0 - все остальные
+        var self = this;
         var row = this.rows[rowIndex];
         var cells = row.getElementsByTagName('td');        
         
-        if (!eventFlag) {
-            for (var i = 0; i < array.length; i++) {
-                // array - массив названий столбцов
-                cells[i].innerHTML = array[i];
-            }             
-        } else {
-    //        var colNames = [];
-    //
-    //        for (var i = 0; i < array.length; i++) {            
-    //            colNames[i] = array[i].name + array[i].txt;
-    //        }        
-
-
-
+        if (topFlag) {
+            
             for (var i = 0; i < cells.length; i++) {
-                // array - контакт
+                // array - массив столбцов                
                 cells[i].innerHTML = array[i].name + array[i].txt;
+                
+                cells[i].propIndex = i;
+                cells[i].onclick = changeSortingDirection;
+            }
+            
+            function changeSortingDirection() {
+                var index = this.propIndex;
+                array[index].changeRise();
+                cells[index].innerHTML = array[index].name + array[index].txt;
 
-    //            if (eventFlag) {
-    //                cells[i].id = colNames[i];
-    ////                cells[i].onclick = changeSortingDirection;
-    //                cells[i].onclick = function() {
-    //                    data[i].oppositeText();
-    //                    cells[i].innerHTML = colNames[i];
-    //                }
-    //            } 
-            }            
+
+                contacts.reverse();
+        //        fillTable(table, contacts, 0);
+                self.fulfill(contacts, 0);
+            }
+            
+
+//            
+//            cells[i].onclick = function() {
+//                        array[i].changeRise();
+//                        cells[i].innerHTML = array[i];
+//                    } 
+            
+        } else {
+            
+            for (var i = 0; i < array.length; i++) {
+                // array - массив контактов
+                cells[i].innerHTML = array[i];
+            }         
         }
 
-    }
+    };
+    
+    this.fulfill = function(contacts, createFlag) {
+        var table = this;
+        var length = contacts.length;
+
+        if (length <= rowMax) {
+
+            fillRows(table, contacts, length);
+            con('контактов : ' + length + ' не больше ' + rowMax + ', навигация по страницам не нужна');
+
+        } else {
+
+            fillRows(table, contacts, rowMax);
+            con('контактов : ' + length + ' больше ' + rowMax + ', делаю навигацию по страницам');
+        }
+
+        function fillRows(table, data, rowsNumber) {
+
+            for (var i = 0; i < rowsNumber; i++) {
+                if (createFlag) table.addNewRow('');
+                var colData = [];
+
+                var table;
+
+                for (var j = 0; j < table.columns.length; j++) {
+                    table.columns[j];
+                    colData.push(data[i][table.columns[j].name]);
+                }        
+        //        colData.push(data[i].id);
+        //        colData.push(data[i].firstName);
+        //        colData.push(data[i].lastName);
+        //        colData.push(data[i].email);
+        //        colData.push(data[i].phone);
+
+                table.fillRowData(i+1, colData, 0);
+            }                
+        }    
+    }    
+    
+    
 
 //    this.addNewCol = function(name, className) {
 //        var row = document.createElement('tr');
 //    }
 }
 
-function Column(name, className, txt) {
+function Column(name, className, txt, rise) {
     this.name = name;
     this.className = className;
     this.txt = txt;
-    this.oppositeText = function() {
-        if (this.txt == ' <span>&#9650;</span>')
-            this.txt =  ' <span>&#9660;</span>';
-        else
+    this.rise = rise;
+    this.changeRise = function() {
+        
+        if (this.rise) 
             this.txt =  ' <span>&#9650;</span>';
+        else
+            this.txt =  ' <span>&#9660;</span>';
+        
+        this.rise = !this.rise;
+        
+//        if (this.txt == ' <span>&#9650;</span>')
+//            this.txt =  ' <span>&#9660;</span>';
+//        else
+//            this.txt =  ' <span>&#9650;</span>';
     }
 //        this.setText = function() {
 //            (this.order) ? this.txt = this.name + ' <span>&#9650;</span>' : this.txt = this.name + ' <span>&#9660;</span>';
