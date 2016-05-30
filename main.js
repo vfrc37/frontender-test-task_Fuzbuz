@@ -51,14 +51,8 @@ function startLoading() {
     // создаем верхнюю строку
     table.addNewRow('top-row smooth-hover');        
 
-    // заполняем верхнюю строку        
-    var colNames = [];
-
-    for (var i = 0; i < columns.length; i++) {            
-        colNames[i] = columns[i].name + columns[i].txt;
-    }
-
-    table.fillRowData(0, colNames);
+    // заполняем верхнюю строку
+    table.fillRowData(0, columns, 1);
 
     // запрашиваем данные с сервера
     $.getJSON(url, function(data) {
@@ -69,13 +63,13 @@ function startLoading() {
 //            console.log('contacts.length : ' + contacts.length);
 //            console.log('contacts[0] : ' + contacts[0]);
 //            var mail = contacts[0].adress.city;
-
+        
+        
         sortCollection(contacts, 'id');
 //            check(contacts, 'id');
-
-//            con('contacts : ' + contacts);
-
-
+        con('коллекцию контактов отсортирована по параметру : ' + 'id');
+                
+        // выводим информацию о контактах в таблицу
         var l = data.length;
 
         if (l <= rowMax) {
@@ -89,9 +83,6 @@ function startLoading() {
             con('контактов : ' + l + ' больше ' + rowMax + ', делаю навигацию по страницам');
         }
 
-
-
-
         // скрываем анимацию загрузки
         con('скрываю анимацию');
 //            displayLoader(false); // вариант без минимальной задержки
@@ -100,39 +91,40 @@ function startLoading() {
             displayLoader(false);
             table.display(true);
             showNavigationButtons(page, rowMax, l);
-        }, 1000); // 1000 ms - минимальное время анимации
-
-
-
+        }, 500); // 500 ms - минимальное время анимации
     });
-
-    function fillRows(table, data, rowsNumber) {
-
-        for (var i = 0; i < rowsNumber; i++) {
-            table.addNewRow('');
-            var colData = [];
-
-            colData.push(data[i].id);
-            colData.push(data[i].firstName);
-            colData.push(data[i].lastName);
-            colData.push(data[i].email);
-            colData.push(data[i].phone);
-
-            table.fillRowData(i+1, colData);
-        }                
-    }
-
-    function displayLoader(flag) {
-        
-        // показать/скрыть анимацию загрузки данных
-        // вариант с visibility работает быстрее варианта с display
-//        (flag) ? $('#loader')[0].style.display = 'block' : $('#loader')[0].style.display = 'none';
-        (flag) ? $('#loader')[0].style.visibility = 'visible' : $('#loader')[0].style.visibility = '';
-    }
-
 }
 
+function fillRows(table, data, rowsNumber) {
 
+    for (var i = 0; i < rowsNumber; i++) {
+        table.addNewRow('');
+        var colData = [];
+        
+        var table;
+        
+        for (var j = 0; j < table.columns.length; j++) {
+            table.columns[j];
+            colData.push(data[i][table.columns[j].name]);
+        }
+        
+//        colData.push(data[i].id);
+//        colData.push(data[i].firstName);
+//        colData.push(data[i].lastName);
+//        colData.push(data[i].email);
+//        colData.push(data[i].phone);
+
+        table.fillRowData(i+1, colData, 0);
+    }                
+}
+
+function displayLoader(flag) {
+    // показать/скрыть анимацию загрузки данных    
+    // вариант с visibility работает быстрее варианта с display
+    
+//        (flag) ? $('#loader')[0].style.display = 'block' : $('#loader')[0].style.display = 'none';
+    (flag) ? $('#loader')[0].style.visibility = 'visible' : $('#loader')[0].style.visibility = '';
+}
 
 function showNavigationButtons(page, pageMax, allMax) {
 
@@ -147,28 +139,15 @@ function showNavigationButtons(page, pageMax, allMax) {
             bottomNext.style.visibility = 'visible';
         }
     }
-
-
-
+    
 }
 //    columns
 
 function Table(tblId, columns) {
+
     this.table = $('#' + tblId)[0];
-
     this.rows = [];
-
-//        this.col = {
-//            index : 0,
-//            classes : []
-//        };
-
-//        this.row = {
-//            index : 0,
-//            classes : [],
-//            top : false
-//        };
-//        var table = $('#' + tblId)
+    this.columns = columns;
 
     this.setWidth = function(w) {
         if (w) this.table.style.width = w + 'px';
@@ -182,81 +161,74 @@ function Table(tblId, columns) {
 
         var self = this;
         var row = document.createElement('tr');
-//            if (topFlag) this.rows.push(row);
         this.rows.push(row);
         if (rowClassName) row.className = rowClassName;
         self.table.appendChild(row);
 
-        var w = 0;
+        var w = 0; // ширина таблицы
 
         for (var i = 0; i < columns.length; i++) {
             var cell = document.createElement('td');
-//                if (cellClassName) cell.className = cellClassName;
             cell.className = columns[i].className;
-//                cell.innerHTML = columns[i];
             row.appendChild(cell);
             w += parseFloat(getComputedStyle(cell).width);
         }
-
+        
+        // устанавливаем ширину таблицы
         self.setWidth(w);
-
     };
 
-    this.fillRowData = function(rowIndex, data) {
+    this.fillRowData = function(rowIndex, array, eventFlag) {
+        
         var row = this.rows[rowIndex];
+        var cells = row.getElementsByTagName('td');        
+        
+        if (!eventFlag) {
+            for (var i = 0; i < array.length; i++) {
+                // array - массив названий столбцов
+                cells[i].innerHTML = array[i];
+            }             
+        } else {
+    //        var colNames = [];
+    //
+    //        for (var i = 0; i < array.length; i++) {            
+    //            colNames[i] = array[i].name + array[i].txt;
+    //        }        
 
-        var cells = row.getElementsByTagName('td');
 
-        for (var i = 0; i < cells.length; i++) {
-            cells[i].innerHTML = data[i];
+
+            for (var i = 0; i < cells.length; i++) {
+                // array - контакт
+                cells[i].innerHTML = array[i].name + array[i].txt;
+
+    //            if (eventFlag) {
+    //                cells[i].id = colNames[i];
+    ////                cells[i].onclick = changeSortingDirection;
+    //                cells[i].onclick = function() {
+    //                    data[i].oppositeText();
+    //                    cells[i].innerHTML = colNames[i];
+    //                }
+    //            } 
+            }            
         }
 
-//            for (var i = 0; i < colNames.length; i++) {
-//                var cell = document.createElement('td');
-//                cell.className = colClasses[i];
-//                cell.innerHTML = colNames[i];
-//                row.appendChild(cell);
-//                w += parseFloat(getComputedStyle(cell).width);
-//            }            
-
     }
 
-    this.addNewCol = function(name, className) {
-        var row = document.createElement('tr');
-
-
-    }
-
-
-
-//        this.createCell = function(name, index, cellClasses) {
-//            
-//        };
+//    this.addNewCol = function(name, className) {
+//        var row = document.createElement('tr');
+//    }
 }
-
-//    function Row(index, colClasses) {
-//        this.index = index,
-//        this.colClasses = colClasses,
-//            
-//        this.addToTable = function(table) {
-//            var row = document.createElement('tr');
-//            (topFlag) ? row.className = classesTop : row.className = classes;
-//        }    
-//    }
-
-//    function Col(tbl, name, index, classes) {
-//        this.tbl = tbl;
-//        this.name = name;
-//        this.index = index;
-//        this.classes = classes;
-//    }
 
 function Column(name, className, txt) {
     this.name = name;
     this.className = className;
-//        this.order = 1;
     this.txt = txt;
-
+    this.oppositeText = function() {
+        if (this.txt == ' <span>&#9650;</span>')
+            this.txt =  ' <span>&#9660;</span>';
+        else
+            this.txt =  ' <span>&#9650;</span>';
+    }
 //        this.setText = function() {
 //            (this.order) ? this.txt = this.name + ' <span>&#9650;</span>' : this.txt = this.name + ' <span>&#9660;</span>';
 //        }
@@ -264,22 +236,9 @@ function Column(name, className, txt) {
 
 function sortCollection(collection, parameter) {
 
-//        if (parameter === 'id') {
-        collection.sort(compare);
-
-
-//            collection.sort(compareStrings);
-//        } else {
-//            collection.sort(compareStrings);
-//        }
+    collection.sort(compare);
 
     // функция сравнения
-    function compareStrings(a, b) {
-//            var c = a;
-//            var d = b;
-        return a[parameter] - b[parameter];
-    }
-
     function compare(a, b) {
         if (parameter === 'id') {
 //                if (a[parameter] == b[parameter]) con('aaa');
