@@ -20,7 +20,7 @@
             min-height: 800px;
 /*            margin-top: -400px;*/
             margin-left: -400px;
-            padding-bottom: 100px;
+            padding: 20px 0;
             border: 1px solid #000;
             text-align: center;
         }
@@ -49,13 +49,15 @@
             display: inline-block;
             margin: 20px;
             padding: 20px;
+            font-size: 24px;
+            cursor: pointer;
         }
         
         #table {
             display: none;
 /*            height: 400px;*/
 /*            width: 700px;*/
-            margin: 50px auto;
+            margin: 20px auto;
             border: 1px solid #000;
             box-sizing: border-box;
         }
@@ -93,6 +95,7 @@
         tr.top-row td {
             border: 1px solid #8BAAFF;
             text-align: center;
+            padding-left: 0;
         }
         
         tr td {
@@ -100,6 +103,25 @@
             text-align: left;
             padding-left: 15px;
         }
+        
+        .display-none {display: none;}
+        
+        .nav-buttons {
+            visibility: hidden;
+            display: inline-block;
+            margin: 20px;
+/*            padding: 10px;*/
+            border: 1px solid #000;
+            font-size: 50px;
+            width: 100px;
+            height: 50px;
+            line-height: 50px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+/*        button {background-color: #dbdbdb;}*/
+        button:focus {outline: none;}
+        div.nav-buttons:hover {background-color: #8d8d8d; transition: background-color .5s;}
         
     
     </style>
@@ -125,11 +147,16 @@
 
         </div>
         <p id='title'>Выберите объем загружаемых данных</p>
+        <div id="top-prev" class='nav-buttons'>&#9665;</div>
+        <div id="top-next" class='nav-buttons'>&#9655;</div>
         <div id="buttons">
             <button id="small" class='button-choose_loading'>Мало данных</button>
             <button id="big" class='button-choose_loading'>Много данных</button>
         </div>
+        
         <table id='table' cellpadding="0" cellspacing="0">
+        
+        
 <!--
             <tr class='top-row'>
                 <td class='small-col'>id <span>&uarr;</span></td>
@@ -140,6 +167,8 @@
             </tr>                    
 -->
         </table>
+        <div id="bottom-prev" class='nav-buttons'>&#9665;</div>
+        <div id="bottom-next" class='nav-buttons'>&#9655;</div>        
         
     </div>
 
@@ -162,7 +191,7 @@
     var dataObject = [];
     
     var rowMax = 20;
-    
+    var page = 0; // номер страницы
     
     function startLoading() {
         
@@ -214,9 +243,14 @@
                 
                 fillRows(table, data, l);
                 con('контактов : ' + l + ' не больше ' + rowMax + ', навигация по страницам не нужна');
+                
             } else {
+                
                 fillRows(table, data, rowMax);
                 con('контактов : ' + l + ' больше ' + rowMax + ', делаю навигацию по страницам');
+                
+                
+
             }
             
             function fillRows(table, data, rowsNumber) {
@@ -243,6 +277,7 @@
             setTimeout(function () {
                 displayLoader(false);
                 table.display(true);
+                showNavigationButtons(page, rowMax, l);
             }, 1000); // 1000 ms - минимальное время анимации
             
             
@@ -252,6 +287,26 @@
         function displayLoader(flag) {
             (flag) ? $('#loader')[0].style.display = 'block' : $('#loader')[0].style.display = 'none';
         }
+        
+    }
+    
+    
+    
+    function showNavigationButtons(page, pageMax, allMax) {
+        
+        var topNext = $('#top-next')[0];
+        var topPrev = $('#top-prev')[0];
+        var bottomNext = $('#bottom-next')[0];
+        var bottomPrev = $('#bottom-prev')[0];
+        
+        if (allMax >= pageMax) {
+            if (page == 0) {
+                topNext.style.visibility = 'visible';
+                bottomNext.style.visibility = 'visible';
+            }
+        }
+        
+
         
     }
     
