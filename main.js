@@ -10,8 +10,9 @@ $('#big').bind('click', startLoading);
 
 var url = ''; // источник данных для загрузки
 var contacts = []; // массив для хранения контактов
+var propCurrent; // свойство по которому сравниваются массивы
 
-var rowMax = 20; // число отображаемых строк таблицы
+var rowMax = 40; // число отображаемых строк таблицы
 var page = 0; // номер страницы
 
 function startLoading() {
@@ -64,13 +65,13 @@ function startLoading() {
 //            console.log('contacts[0] : ' + contacts[0]);
 //            var mail = contacts[0].adress.city;
         
-        
-        sortCollection(contacts, 'id');
+        // начальная сортировка коллекции
+        propCurrent = table.columns[0].name;        
+        sortCollection(contacts, propCurrent);
 //            check(contacts, 'id');
         con('коллекцию контактов отсортирована по параметру : ' + 'id');
                 
         // выводим информацию о контактах в таблицу
-//        fillTable(table, contacts, 1);
         table.fulfill(contacts, 1);
 
         // скрываем анимацию загрузки
@@ -84,44 +85,6 @@ function startLoading() {
         }, 500); // 500 ms - минимальное время анимации
     });
 }
-
-//function fillTable(table, contacts, createFlag) {
-//    
-//    var length = contacts.length;
-//    
-//    if (length <= rowMax) {
-//
-//        fillRows(table, contacts, length);
-//        con('контактов : ' + length + ' не больше ' + rowMax + ', навигация по страницам не нужна');
-//
-//    } else {
-//
-//        fillRows(table, contacts, rowMax);
-//        con('контактов : ' + length + ' больше ' + rowMax + ', делаю навигацию по страницам');
-//    }
-//    
-//    function fillRows(table, data, rowsNumber) {
-//
-//        for (var i = 0; i < rowsNumber; i++) {
-//            if (createFlag) table.addNewRow('');
-//            var colData = [];
-//
-//            var table;
-//
-//            for (var j = 0; j < table.columns.length; j++) {
-//                table.columns[j];
-//                colData.push(data[i][table.columns[j].name]);
-//            }        
-//    //        colData.push(data[i].id);
-//    //        colData.push(data[i].firstName);
-//    //        colData.push(data[i].lastName);
-//    //        colData.push(data[i].email);
-//    //        colData.push(data[i].phone);
-//
-//            table.fillRowData(i+1, colData, 0);
-//        }                
-//    }    
-//}
 
 function displayLoader(flag) {
     // показать/скрыть анимацию загрузки данных    
@@ -195,18 +158,32 @@ function Table(tblId, columns) {
                 // array - массив столбцов                
                 cells[i].innerHTML = array[i].name + array[i].txt;
                 
-                cells[i].propIndex = i;
+                cells[i].propIndex = i; // сохраняем ссылку на элемент
                 cells[i].onclick = changeSortingDirection;
             }
             
             function changeSortingDirection() {
+                                
+                // получаем параметр сортировки                
                 var index = this.propIndex;
-                array[index].changeRise();
-                cells[index].innerHTML = array[index].name + array[index].txt;
-
-
-                contacts.reverse();
-        //        fillTable(table, contacts, 0);
+                
+                // меняем текст на противоположный
+                self.columns[index].changeRise();
+                cells[index].innerHTML = self.columns[index].name + self.columns[index].txt;
+                
+                // поменялся ло параметр сортировки ?
+                var prop = self.columns[index].name;              
+                
+                if (prop == propCurrent) {
+                    // не поменялся -> просто делаем обратный порядок
+                    contacts.reverse();
+                } else {
+                    // поменялся -> делаем новую сортировку
+                    propCurrent = prop;
+                    sortCollection(contacts, prop);
+                }
+                    
+                // выводим новую информацию о контактах в таблицу
                 self.fulfill(contacts, 0);
             }
             
@@ -303,11 +280,12 @@ function sortCollection(collection, parameter) {
     // функция сравнения
     function compare(a, b) {
         if (parameter === 'id') {
-//                if (a[parameter] == b[parameter]) con('aaa');
-            if (a[parameter] > b[parameter]) return 1;
-            if (a[parameter] < b[parameter]) return -1;                
-        } else {
             return a[parameter] - b[parameter];
+                
+        } else {
+            //                if (a[parameter] == b[parameter]) con('aaa');
+            if (a[parameter] > b[parameter]) return 1;
+            if (a[parameter] < b[parameter]) return -1;
         }
     }        
 
