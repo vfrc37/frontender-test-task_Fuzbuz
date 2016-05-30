@@ -80,12 +80,12 @@
             width: 160px;
         }
         
-        tr#top-row {
+        tr.top-row {
             height: 60px;
             background-color: #CEDBFF;
         }
         
-        tr#top-row td {
+        tr.top-row td {
             border: 1px solid #8BAAFF;
         }
         
@@ -118,7 +118,7 @@
             <button id="big" class='button-choose_loading'>Много данных</button>
         </div>
         <table id='table' cellpadding="0" cellspacing="0">
-            <tr id='top-row'>
+            <tr class='top-row'>
                 <td class='small-col'>id <span>&uarr;</span></td>
                 <td class='normal-col'>firstName <span>&darr;</span></td>
                 <td class='normal-col'>lastName <span>&#9650;</span></td>
@@ -182,6 +182,15 @@
                 displayLoader(false);
             }, 1000); // 1000 ms - минимальное время анимации
             
+            // новая таблица
+            var tblId = 'table';
+            var colNames = ['id', 'firstName', 'lastName', 'email', 'phone'];
+            var topRowClasses = [];
+            var rowClasses = [];
+            var colClasses = ['small-col', 'normal-col', ];
+            
+            var table = new Table(tblId, colNames, topRowClasses, rowClasses, colClasses);
+            table.addNewRow('top-row');
         });
         
         function displayLoader(flag) {
@@ -190,8 +199,57 @@
         
     }
     
-    function Table(tblId, colSort) {
+    function Table(tblId, colNames, topRowClasses, rowClasses, lClasses) {
         this.table = $('#' + tblId);
+        
+        this.rows = [];
+        this.colNames = colNames;
+        
+//        this.col = {
+//            index : 0,
+//            classes : []
+//        };
+        
+//        this.row = {
+//            index : 0,
+//            classes : [],
+//            top : false
+//        };
+        
+        this.addNewRow = function(className) {
+            
+            var row = document.createElement('tr');
+            if (className) row.className = className;
+            this.table.appendChild(row);
+            
+        };        
+        
+//        this.createCell = function(name, index, cellClasses) {
+//            
+//        };
+    }
+    
+//    function Row(index, classes, classesTop, topFlag) {
+//        this.index = index,
+//        this.classes = classes,
+//        this.classesTop = classesTop,
+//        this.top = topFlag,
+//            
+//        this.addToTable = function(table) {
+//            var row = document.createElement('tr');
+//            (topFlag) ? row.className = classesTop : row.className = classes;
+//        }    
+//    }
+    
+//    function Col(tbl, name, index, classes) {
+//        this.tbl = tbl;
+//        this.name = name;
+//        this.index = index;
+//        this.classes = classes;
+//    }
+    
+    function sortArray() {
+        
     }
     
 //    function Contact() {
