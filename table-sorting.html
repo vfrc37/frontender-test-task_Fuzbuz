@@ -187,8 +187,8 @@
 //    big.onclick   = startLoading;
     
     var url = ''; // источник данных для загрузки
-//    var dataObject = function(url) {}    
-    var dataObject = [];
+//    var contacts = function(url) {}    
+    var contacts = []; // массив для хранения контактов
     
     var rowMax = 20;
     var page = 0; // номер страницы
@@ -202,7 +202,7 @@
         displayLoader(true);
         con('начало загрузки данных с сервера, показ анимации');
         
-        // определяем вариант загрузки
+        // определяем источник загружаемых данных
         switch (this.id) {
                 
             case 'small' :
@@ -212,62 +212,57 @@
             case 'big' :
                 url = 'http://www.filltext.com/?rows=1000&id=%7Bnumber%7C1000%7D&firstName=%7BfirstName%7D&delay=3&lastName=%7BlastName%7D&email=%7Bemail%7D&phone=%7Bphone%7C(xxx)xxx-xx-xx%7D&adress=%7BaddressObject%7D&description=%7Blorem%7C32%7D';
                 break;                
-        }
+        }        
+        
+        // параметры столбцов
+        var columns = [];        
+        columns.push(new Column('id'       , 'small-col' , ' <span>&#9650;</span>'));
+        columns.push(new Column('firstName', 'normal-col', ' <span>&#9650;</span>'));
+        columns.push(new Column('lastName' , 'normal-col', ' <span>&#9650;</span>'));
+        columns.push(new Column('email'    , 'large-col' , ' <span>&#9650;</span>'));
+        columns.push(new Column('phone'    , 'big-col'   , ' <span>&#9650;</span>'));
         
         // новая таблица
-        var tblId = 'table';
-        var colNames = ['id', 'firstName', 'lastName', 'email', 'phone'];
-        var colClasses = ['small-col', 'normal-col', 'normal-col', 'large-col', 'big-col'];
-//        colClasses = [];
-
-//            var topRowClasses = [];
-//            var rowClasses = [];
-
-        var table = new Table(tblId, colNames, colClasses);
+        var tblId = 'table';        
+        var table = new Table(tblId, columns);
         table.display(false);
-        table.addNewRow('top-row');
+        
+        // создаем верхнюю строку
+        table.addNewRow('top-row');        
+        
+        // заполняем верхнюю строку        
+        var colNames = [];
+        
+        for (var i = 0; i < columns.length; i++) {            
+            colNames[i] = columns[i].name + columns[i].txt;
+        }
+        
         table.fillRowData(0, colNames);
         
+        // запрашиваем данные с сервера
         $.getJSON(url, function(data) {
             
             con('данные получены');
-            dataObject = data;
+            contacts = data.slice(); // копия загруженных данных
             
-            console.log('data.length : ' + data.length);
-            console.log('data[0] : ' + data[0]);
-            var mail = dataObject[0].adress.city;
+            console.log('contacts.length : ' + contacts.length);
+            console.log('contacts[0] : ' + contacts[0]);
+            var mail = contacts[0].adress.city;
             
             var l = data.length;
             
             if (l <= rowMax) {
                 
-                fillRows(table, data, l);
+                fillRows(table, contacts, l);
                 con('контактов : ' + l + ' не больше ' + rowMax + ', навигация по страницам не нужна');
                 
             } else {
                 
-                fillRows(table, data, rowMax);
+                fillRows(table, contacts, rowMax);
                 con('контактов : ' + l + ' больше ' + rowMax + ', делаю навигацию по страницам');
-                
-                
-
             }
             
-            function fillRows(table, data, rowsNumber) {
-                
-                for (var i = 0; i < rowsNumber; i++) {
-                    table.addNewRow('');
-                    var colData = [];
-
-                    colData.push(data[i].id);
-                    colData.push(data[i].firstName);
-                    colData.push(data[i].lastName);
-                    colData.push(data[i].email);
-                    colData.push(data[i].phone);
-
-                    table.fillRowData(i+1, colData);
-                }                
-            }
+            
 
             
             // скрываем анимацию загрузки
@@ -283,6 +278,22 @@
             
 
         });
+        
+        function fillRows(table, data, rowsNumber) {
+                
+            for (var i = 0; i < rowsNumber; i++) {
+                table.addNewRow('');
+                var colData = [];
+
+                colData.push(data[i].id);
+                colData.push(data[i].firstName);
+                colData.push(data[i].lastName);
+                colData.push(data[i].email);
+                colData.push(data[i].phone);
+
+                table.fillRowData(i+1, colData);
+            }                
+        }
         
         function displayLoader(flag) {
             (flag) ? $('#loader')[0].style.display = 'block' : $('#loader')[0].style.display = 'none';
@@ -309,12 +320,12 @@
 
         
     }
+//    columns
     
-    function Table(tblId, colNames, colClasses) {
+    function Table(tblId, columns) {
         this.table = $('#' + tblId)[0];
         
         this.rows = [];
-//        this.colNames = colNames;
         
 //        this.col = {
 //            index : 0,
@@ -347,11 +358,11 @@
             
             var w = 0;
             
-            for (var i = 0; i < colNames.length; i++) {
+            for (var i = 0; i < columns.length; i++) {
                 var cell = document.createElement('td');
 //                if (cellClassName) cell.className = cellClassName;
-                cell.className = colClasses[i];
-//                cell.innerHTML = colNames[i];
+                cell.className = columns[i].className;
+//                cell.innerHTML = columns[i];
                 row.appendChild(cell);
                 w += parseFloat(getComputedStyle(cell).width);
             }
@@ -408,6 +419,17 @@
 //        this.index = index;
 //        this.classes = classes;
 //    }
+    
+    function Column(name, className, txt) {
+        this.name = name;
+        this.className = className;
+//        this.order = 1;
+        this.txt = txt;
+        
+//        this.setText = function() {
+//            (this.order) ? this.txt = this.name + ' <span>&#9650;</span>' : this.txt = this.name + ' <span>&#9660;</span>';
+//        }
+    }
     
     function sortArray() {
         
