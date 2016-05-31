@@ -6,6 +6,8 @@ var loadingDelay = 500; // loadingDelay [ms] минимальное время �
 var small = $('#small')[0];
 var big   = $('#big')[0];
 var title   = $('#title')[0];
+var pageNumber   = $('#page-number')[0];
+var infoBox   = $('#info-box')[0];
 
 var table;
 var url = ''; // источник данных для загрузки
@@ -158,6 +160,10 @@ function showNavigationButtons(page, pages) {
         }
         displayPageNumber(page, true);
     } else {
+        topNext.style.display = 'none';
+        topPrev.style.display = 'none';
+        bottomNext.style.display = 'none';    
+        bottomPrev.style.display = 'none';
         displayPageNumber(page, false);
     }
     
@@ -204,6 +210,8 @@ function Table(tblId, columns) {
             row.appendChild(cell);
             w += parseFloat(getComputedStyle(cell).width);
         }
+        
+        row.onclick = contactChoosed;
         
         // устанавливаем ширину таблицы
         self.setWidth(w);
@@ -476,9 +484,16 @@ function goPrevPage() {
 }
 
 function displayPageNumber(page, flag) {
-    var elem = $('#page-number')[0];
-    elem.innerHTML = 'page : ' + (page + 1);
-    (flag) ? elem.style.visibility = 'visible' : elem.style.visibility = '';    
+    pageNumber.innerHTML = 'page : ' + (page + 1);
+    (flag) ? pageNumber.style.visibility = 'visible' : pageNumber.style.visibility = '';    
+}
+
+function displayInfoBox(flag) {
+    (flag) ? infoBox.style.visibility = 'visible' : infoBox.style.visibility = '';    
+}
+
+function contactChoosed() {
+    displayInfoBox(true);
 }
 
 //function launchPage() {
