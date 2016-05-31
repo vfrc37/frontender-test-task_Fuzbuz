@@ -12,7 +12,7 @@ var url = ''; // источник данных для загрузки
 var contacts = []; // массив для хранения контактов
 var propCurrent; // свойство по которому сравниваются массивы
 
-var rowMax = 30; // число отображаемых строк таблицы
+var rowMax = 50; // число отображаемых строк таблицы
 var page = 0; // номер страницы
 var pages = 0; // число страниц
 
@@ -228,7 +228,8 @@ function Table(tblId, columns) {
             }
             
             function changeSortingDirection() {
-                                
+                // функция changeSortingDirection меняет порядок сортировки
+                
                 // получаем параметр сортировки                
                 var index = this.propIndex;
                 // параметр сортировки
@@ -257,10 +258,14 @@ function Table(tblId, columns) {
                     // поменялся -> делаем новую сортировку (по возрастанию)
                     propCurrent = prop;
                     sortCollection(contacts, prop);
+//                    page = 0;
                 }
+                
+                page = 0; // возвращаемся на 1-ю страницу
                     
                 // выводим новую информацию о контактах в таблицу
                 self.fillContent(contacts, page);
+                showNavigationButtons(page, pages);
             }
             
         } else {
@@ -272,6 +277,7 @@ function Table(tblId, columns) {
             }         
         }
         
+        // убираем скрытие строк (если оно было)
         row.style.display = '';
     };
     
@@ -290,13 +296,13 @@ function Table(tblId, columns) {
         
         var rows = self.rows;
         
+        // скрываем лишние строки
         for (var i = start; i <= end; i++) {
             rows[i].style.display = 'none';
+            // при необходимости можно сбросить html для скрытых строк
         }
         
     }
-    
-//    this.fillRows
     
     this.fillContent = function(data, page) {
         
@@ -344,7 +350,15 @@ function Table(tblId, columns) {
                 self.fillRowData(i+1, colData, 0);
             }                
         }    
-    }
+    };
+    
+    this.launchPage = function(data, page, pages) {
+        var self = this;
+    
+        self.fillContent(data, page);
+    
+        showNavigationButtons(page, pages);
+    };    
 }
 
 // конструктор для объектов - столбцец
@@ -450,24 +464,26 @@ function checkSameData(cols, collection, parameter, startIndex, endIndex) {
 
 function goNextPage() {
     page++;
-    launchPage();
+    table.launchPage(contacts, page, pages);
     
 }
 function goPrevPage() {
     page--;
-    launchPage();
+    table.launchPage(contacts, page, pages);
 }
 
-function launchPage() {
-    con('page : ' + page);
-    
-//    var l = contacts.length;
-    
-//    if (l - page * rowMax >= rowMax) table.fillContent(contacts, page);
-    table.fillContent(contacts, page);
-    
-    showNavigationButtons(page, pages);
-}
+//function launchPage() {
+//    
+//    // загрузка новых данных для страницы page
+////    con('page : ' + page);
+//    
+////    var l = contacts.length;
+//    
+////    if (l - page * rowMax >= rowMax) table.fillContent(contacts, page);
+//    table.fillContent(contacts, page);
+//    
+//    showNavigationButtons(page, pages);
+//}
 
 // ***   ОТЛАДКА   ***
 // вывод информации о ходе выполнения программы
