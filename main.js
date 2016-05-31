@@ -156,6 +156,9 @@ function showNavigationButtons(page, pages) {
                 bottomPrev.style.visibility = 'visible';                 
             }         
         }
+        displayPageNumber(page, true);
+    } else {
+        displayPageNumber(page, false);
     }
     
 //    if (allMax >= pageMax) {
@@ -470,6 +473,12 @@ function goNextPage() {
 function goPrevPage() {
     page--;
     table.launchPage(contacts, page, pages);
+}
+
+function displayPageNumber(page, flag) {
+    var elem = $('#page-number')[0];
+    elem.innerHTML = 'page : ' + (page + 1);
+    (flag) ? elem.style.visibility = 'visible' : elem.style.visibility = '';    
 }
 
 //function launchPage() {
