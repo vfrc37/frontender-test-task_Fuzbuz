@@ -57,6 +57,14 @@
             z-index: 1;
         }
         
+        form {
+            font-size: 20px;
+        }
+        
+        form select {
+            font-size: 30px;
+        }
+        
         .button-choose_loading {
             display: inline-block;
             margin: 20px;
@@ -84,8 +92,8 @@
         }
         
         #info-box textarea {
-            height: 60px;
-            width: 240px;
+            height: 96px;
+            width: 260px;
         }
         
         #table {
@@ -170,7 +178,7 @@
             cursor: pointer;
         }
 /*        button {background-color: #dbdbdb;}*/
-        button:focus {outline: none;}
+        button:focus, select:focus {outline: none;}
         div.nav-buttons:hover {background-color: #8d8d8d;}
         
         .smooth-hover, tr.smooth-hover td {
@@ -204,6 +212,14 @@
             <button id="small" class='button-choose_loading'>Мало данных</button>
             <button id="big" class='button-choose_loading'>Много данных</button>
         </div>
+        
+        <form><p>Число строк в выводе</p>
+            <select id='select-rows_number' name="s1">
+                <option value="50">50</option>
+                <option value="20">20</option>
+                <option value="10">10</option>
+            </select>
+        </form>
         
         <!--   верхняя навигация   -->
         <div id="top-prev" class='nav-buttons smooth-hover'>&#9665;</div>
