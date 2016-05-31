@@ -65,6 +65,15 @@
             cursor: pointer;
         }
         
+        #info-box {
+            min-height: 300px;
+            width: 500px;
+            position: relative;
+            left: 50px;
+            font-size: 16px;
+            border: 1px solid #000;
+        }
+        
         #table {
             display: none;
 /*            height: 400px;*/
@@ -162,8 +171,7 @@
 </head>
 <body>
     <div id="wrapper">
-        <div id="loader">
-        <!--    taken from http://cssload.net#sthash.iNaN8lKs.dpuf-->
+        <div id="loader"><!--    taken from http://cssload.net#sthash.iNaN8lKs.dpuf-->        
             <div id="floatingBarsG">
                 <div class="blockG" id="rotateG_01"></div>
                 <div class="blockG" id="rotateG_02"></div>
@@ -174,36 +182,32 @@
                 <div class="blockG" id="rotateG_07"></div>
                 <div class="blockG" id="rotateG_08"></div>
             </div>
-
         </div>
         <p id='title'>Выберите объем загружаемых данных</p>
-        <div id="top-prev" class='nav-buttons smooth-hover'>&#9665;</div>
-        <div id="top-next" class='nav-buttons smooth-hover'>&#9655;</div>
+        
+        <!--   кнопки для выбора варианта загрузки   -->
         <div id="buttons">
             <button id="small" class='button-choose_loading'>Мало данных</button>
             <button id="big" class='button-choose_loading'>Много данных</button>
         </div>
         
-        <table id='table' cellpadding="10" cellspacing="0">
+        <!--   верхняя навигация   -->
+        <div id="top-prev" class='nav-buttons smooth-hover'>&#9665;</div>
+        <div id="top-next" class='nav-buttons smooth-hover'>&#9655;</div>
         
+        <!--   таблица   -->
+        <table id='table' cellpadding="10" cellspacing="0"></table>
         
-<!--
-            <tr class='top-row'>
-                <td class='small-col'>id <span>&uarr;</span></td>
-                <td class='normal-col'>firstName <span>&darr;</span></td>
-                <td class='normal-col'>lastName <span>&#9650;</span></td>
-                <td class='normal-col'>email <span>&#9660;</span></td>
-                <td class='big-col'>phone <span>&uarr;</span></td>                
-            </tr>                    
--->
-        </table>
+        <!--   нижняя навигация   -->
         <div id="bottom-prev" class='nav-buttons smooth-hover'>&#9665;</div>
-        <div id="bottom-next" class='nav-buttons smooth-hover'>&#9655;</div>        
-        <div id="page-number">page : </div>
+        <div id="bottom-next" class='nav-buttons smooth-hover'>&#9655;</div>
+        
+        <!--   блок для показа информации   -->
+        <div id="info-box"></div>
+        
+        <!--   номер страницы   -->
+        <div id="page-number">page : 0</div>
     </div>
-
-    
-<script type="text/javascript" src="main.js"></script>
-  
+    <script type="text/javascript" src="main.js"></script>
 </body>
 </html>
