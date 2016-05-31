@@ -7,7 +7,15 @@ var small = $('#small')[0];
 var big   = $('#big')[0];
 var title   = $('#title')[0];
 var pageNumber   = $('#page-number')[0];
+var selectRowsNumber   = $('#select-rows_number')[0];
+
 var infoBox   = $('#info-box')[0];
+var infoNm   = $('#info-name')[0];
+var infoDsc   = $('#info-description')[0];
+var infoAdr   = $('#info-adress')[0];
+var infoTwn   = $('#info-town')[0];
+var infoSt   = $('#info-state')[0];
+var infoZp   = $('#info-zip')[0];
 
 var table;
 var url = ''; // источник данных для загрузки
@@ -24,11 +32,21 @@ var bottomNext = $('#bottom-next')[0];
 var bottomPrev = $('#bottom-prev')[0];
 
 function startLoading() {
+        
+    // находим число строк таблицы для вывода
+    for (var i = 0; i < selectRowsNumber.options.length; i++) {
+        var option = selectRowsNumber.options[i];
+        if(option.selected) {
+            rowMax = +option.value;            
+        }
+    }
+    con('выбрано строк для вывода : ' + rowMax);
     
     // скрываем начальные элементы
     small.style.display = 'none';
     big.style.display = 'none';
     title.style.display = 'none';
+    selectRowsNumber.parentNode.style.display = 'none'; // скрываем всю форму
     
     // показываем анимацию загрузки
     displayLoader(true);
@@ -56,11 +74,12 @@ function startLoading() {
 
     // новая таблица
     var tblId = 'table';        
-    table = new Table(tblId, columns);
+    table = new Table(tblId, columns, true);
     table.display(false);
 
     // создаем верхнюю строку
-    table.addNewRow('top-row smooth-hover');        
+    table.addNewRow('top-row smooth-hover');
+    table.rows[0].index = 0; // индекс строки как ссылка на контакт
 
     // заполняем верхнюю строку
     table.fillRowData(0, columns, 1);
@@ -91,7 +110,7 @@ function startLoading() {
         
 //        checkSameData(table.columns, contacts, propCurrent, 0, contacts.length - 1);        
         
-        con('коллекцию контактов отсортирована по параметру : ' + 'id');
+        con('коллекцию контактов отсортирована по параметру : ' + propCurrent);
                 
         // создаем необходимое число строк
         table.createRows(Math.min(contacts.length, rowMax));
@@ -102,21 +121,19 @@ function startLoading() {
         // скрываем анимацию загрузки
         con('скрываю анимацию');
         
-        if (useLoadingDelay) {
-            
+        if (useLoadingDelay) {            
             // вариант c минимальной задержкой
             setTimeout(function () {
                 displayLoader(false);
                 table.display(true);
-                showNavigationButtons(page, pages);
+                showNavigationElements(page, pages);
             }, loadingDelay);
             
-        } else {
-            
+        } else {            
             // вариант без минимальной задержки
             displayLoader(false); 
             table.display(true);
-            showNavigationButtons(page, pages);
+            showNavigationElements(page, pages);
         }
     });
 }
@@ -130,7 +147,7 @@ function displayLoader(flag) {
     // вариант с visibility работает быстрее варианта с display
 }
 
-function showNavigationButtons(page, pages) {
+function showNavigationElements(page, pages) {
     
     if (pages > 1) {
         
@@ -158,30 +175,32 @@ function showNavigationButtons(page, pages) {
                 bottomPrev.style.visibility = 'visible';                 
             }         
         }
-        displayPageNumber(page, true);
+        
+        // показываем номер страницы
+        displayPageNumber(true);
+        
     } else {
+        
         topNext.style.display = 'none';
         topPrev.style.display = 'none';
         bottomNext.style.display = 'none';    
         bottomPrev.style.display = 'none';
-        displayPageNumber(page, false);
+        displayPageNumber(false);
     }
     
-//    if (allMax >= pageMax) {
-//        if (page == 0) {
-//            topNext.style.visibility = 'visible';
-//            bottomNext.style.visibility = 'visible';
-//        }
-//    }
-    
+    function displayPageNumber(flag) {
+        pageNumber.innerHTML = 'page : ' + (page + 1);
+        (flag) ? pageNumber.style.visibility = 'visible' : pageNumber.style.visibility = '';    
+    }
 }
 
 // конструктор для объектов - таблица
-function Table(tblId, columns) {
+function Table(tblId, columns, directionFlag) {
 
-    this.table = $('#' + tblId)[0];
-    this.rows = [];
-    this.columns = columns;
+    this.table = $('#' + tblId)[0]; // DOM элемент
+    this.rows = []; // массив строк
+    this.columns = columns; // массив столбцов
+    this.directionFlag = directionFlag; // флаг для определения направления сортировки (1 - по возрастанию, 0 - по убыванию)
     
     // установка ширины таблицы w px
     this.setWidth = function(w) {
@@ -196,11 +215,11 @@ function Table(tblId, columns) {
     // добавление строки с классом rowClassName
     this.addNewRow = function(rowClassName) {
 
-        var self = this;
+//        var self = this;
         var row = document.createElement('tr');
         this.rows.push(row);
         if (rowClassName) row.className = rowClassName;
-        self.table.appendChild(row);
+        this.table.appendChild(row);
 
         var w = 0; // ширина таблицы
 
@@ -214,7 +233,7 @@ function Table(tblId, columns) {
         row.onclick = contactChoosed;
         
         // устанавливаем ширину таблицы
-        self.setWidth(w);
+        this.setWidth(w);
     };
 
     this.fillRowData = function(rowIndex, data, topFlag) {
@@ -225,32 +244,33 @@ function Table(tblId, columns) {
         var self = this;
         var row = this.rows[rowIndex];
         var cells = row.getElementsByTagName('td');        
-        
+                
         // заполнение верхней строки
         if (topFlag) {
-            // здесь data - массив столбцов
+            
+            // при topFlag == true, data - массив столбцов
             
             for (var i = 0; i < cells.length; i++) {
                 
-                cells[i].innerHTML = data[i].name + data[i].txt;
-                
-                cells[i].propIndex = i; // сохраняем ссылку на элемент
+                cells[i].innerHTML = data[i].name + data[i].txt;                
+                cells[i].tdIndex = i; // сохраняем ссылку на ячейку td
                 cells[i].onclick = changeSortingDirection;
             }
             
             function changeSortingDirection() {
                 // функция changeSortingDirection меняет порядок сортировки
-                
+
                 // получаем параметр сортировки                
-                var index = this.propIndex;
+                var index = this.tdIndex;
+                
                 // параметр сортировки
                 var prop = self.columns[index].name;                
                 
+                // возвращаем исходные значения
                 for (var i = 0; i < data.length; i++) {
                     
-                    // возвращаем исходные значения
-                    if (i != index) { 
-                        // кроме выбранного столбца
+                    // кроме выбранного столбца
+                    if (i != index) {
                         data[i].setDefaultValues();
                         cells[i].innerHTML = self.columns[i].name + self.columns[i].txt;
                     }                    
@@ -261,31 +281,47 @@ function Table(tblId, columns) {
                     // не поменялся -> делаем обратную сортировку
                     contacts.reverse();
                     
+                    // меняем флаг для направления сортировки
+                    self.directionFlag  = !self.directionFlag;
+                    
                     // меняем значок навигации на противоположный
                     self.columns[index].changeRise();
                     cells[index].innerHTML = self.columns[index].name + self.columns[index].txt;                    
                    
                 } else {
                     // поменялся -> делаем новую сортировку (по возрастанию)
+                    self.directionFlag = true;
+                    
                     propCurrent = prop;
                     sortCollection(contacts, prop);
-//                    page = 0;
                 }
                 
-                page = 0; // возвращаемся на 1-ю страницу
+//                con('self.directionFlag : ' + self.directionFlag);
+                page = 0; // возвращаемся на 1-ю страницу (с индексом 0)
                     
                 // выводим новую информацию о контактах в таблицу
                 self.fillContent(contacts, page);
-                showNavigationButtons(page, pages);
+                showNavigationElements(page, pages);
             }
             
         } else {
             // заполнение остальных строк
-            // здесь data - массив контактов
+            // при topFlag == false, data - массив контактов
             
+            // html
             for (var i = 0; i < data.length; i++) {                
-                cells[i].innerHTML = data[i];
-            }         
+                cells[i].innerHTML = data[i].data;
+            }
+            
+            // выставляем новый row.index в зависимости от направления сортировки (значения self.directionFlag)
+            if (!self.directionFlag) {
+                 
+                row.index = contacts.length - data[0].rowId + 2; // почему +2 - см. в отладчике;
+                
+            } else {
+                
+                row.index = data[0].rowId;
+            }
         }
         
         // убираем скрытие строк (если оно было)
@@ -294,18 +330,15 @@ function Table(tblId, columns) {
     
     this.createRows = function(rowsNumber) {
         
-        var self = this;
-        
+        // создаем rowsNumber строк
         for (var i = 0; i < rowsNumber; i++) {
-            self.addNewRow('');
+            this.addNewRow('');
         }        
     };
     
     this.hideRows = function(start, end) {
         // скрыть строки с индексами от start до end
-        var self = this;
-        
-        var rows = self.rows;
+        var rows = this.rows;
         
         // скрываем лишние строки
         for (var i = start; i <= end; i++) {
@@ -326,35 +359,44 @@ function Table(tblId, columns) {
         var rest = length - page * rowMax; // оставшееся число контактов
         
         if (rest >= rowMax) {
-            // 
+            // промежуточная страница
             rowsStartIndex = page * rowMax;
             rowsEndIndex = (page + 1) * rowMax;
             
             fillRows(data, rowsStartIndex, rowsEndIndex);
 
         } else {
+            // последняя страница
             rowsStartIndex = page * rowMax;
             rowsEndIndex = length;
             
             fillRows(data, rowsStartIndex, rowsEndIndex);
-            if (page) self.hideRows(rest + 1, rowMax);
+            // скрываем оставшиеся строки
+            if (page) this.hideRows(rest + 1, rowMax);
         }
 
-        function fillRows(data, rowsStartIndex, rowsEndIndex) {            
+        function fillRows(data, rowsStartIndex, rowsEndIndex) {
             
-            // создание/заполнение строк с номерами от rowsStartIndex до rowsEndIndex
-            
+            // заполнение строк с номерами от rowsStartIndex до rowsEndIndex            
             for (var i = 0; i < rowsEndIndex - rowsStartIndex; i++) {
-                
-//                if (createFlag) self.addNewRow(''); // создание строки при первой загрузке
                 
                 // colData - массив данных для строки, индекс элемента в colData = индекс столбца
                 var colData = [];
                 
                 // добавляем данные в colData
                 for (var j = 0; j < self.columns.length; j++) {
-                    self.columns[j];
-                    colData.push(data[rowsStartIndex + i][self.columns[j].name]);
+                    
+                    var rowIndex = rowsStartIndex + i;
+                    
+                    // меняем индекс на противоположный при сортировке по убыванию
+                    if (!self.directionFlag) rowIndex = contacts.length - rowIndex;
+                    
+                    var obj = {
+                                data  : data[rowsStartIndex + i][self.columns[j].name], // данные для заполнения строки
+                                rowId : (rowIndex + 1) // rowId - внутренняя переменная (индекс строки); + 1 - т.к. есть еще и верхняя строка
+                              };
+                    
+                    colData.push(obj);
                 }
                 
                 // заполняем таблицу
@@ -364,11 +406,12 @@ function Table(tblId, columns) {
     };
     
     this.launchPage = function(data, page, pages) {
-        var self = this;
-    
-        self.fillContent(data, page);
-    
-        showNavigationButtons(page, pages);
+
+        // заполняем новые данные
+        this.fillContent(data, page);
+        
+        // отображаем навигацию
+        showNavigationElements(page, pages);
     };    
 }
 
@@ -409,11 +452,15 @@ function sortCollection(collection, parameter) {
                 
         } else {
             // сравнение строковых данных
-//            if (a[parameter] == b[parameter]) {
-//                return ...
-//            }
             if (a[parameter] > b[parameter]) return 1;
             if (a[parameter] < b[parameter]) return -1;
+            
+//            if (a[parameter] == b[parameter]) {
+//                for (var i = 0; i < table.columns.length; i++) {
+//                    
+//                }
+//                return ...
+//            }            
         }
     }
 }
@@ -478,14 +525,10 @@ function goNextPage() {
     table.launchPage(contacts, page, pages);
     
 }
+
 function goPrevPage() {
     page--;
     table.launchPage(contacts, page, pages);
-}
-
-function displayPageNumber(page, flag) {
-    pageNumber.innerHTML = 'page : ' + (page + 1);
-    (flag) ? pageNumber.style.visibility = 'visible' : pageNumber.style.visibility = '';    
 }
 
 function displayInfoBox(flag) {
@@ -493,21 +536,32 @@ function displayInfoBox(flag) {
 }
 
 function contactChoosed() {
-    displayInfoBox(true);
-}
+    
+    if(this.index > 0) {
+        // выбрана не верхняя строка
 
-//function launchPage() {
-//    
-//    // загрузка новых данных для страницы page
-////    con('page : ' + page);
-//    
-////    var l = contacts.length;
-//    
-////    if (l - page * rowMax >= rowMax) table.fillContent(contacts, page);
-//    table.fillContent(contacts, page);
-//    
-//    showNavigationButtons(page, pages);
-//}
+//        con('index : ' + this.index);
+        
+        var contact = contacts[this.index - 1];
+        
+        // выводим информацию по контакту
+        fillContact(contact);
+        
+        function fillContact(contact) {
+            
+            infoNm.innerHTML = 'Выбран пользователь: <b>' + contact.firstName + ' ' + contact.lastName + '</b></p>';
+            infoDsc.innerHTML = contact.description;
+            infoAdr.innerHTML = 'Адрес проживания: <b>' + contact.adress.streetAddress + '</b></p>';
+            infoTwn.innerHTML = 'Город: <b>' + contact.adress.city + '</b></p>';
+            infoSt.innerHTML = 'Провинция/штат: <b>' + contact.adress.state + '</b></p>';
+            infoZp.innerHTML = 'Индекс: <b>' + contact.adress.zip + '</b></p>';
+        }
+        
+        // показываем бокс с информацией
+        displayInfoBox(true);        
+    }
+
+}
 
 // ***   ОТЛАДКА   ***
 // вывод информации о ходе выполнения программы
