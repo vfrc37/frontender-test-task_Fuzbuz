@@ -8,6 +8,7 @@ var big   = $('#big')[0];
 var title   = $('#title')[0];
 var pageNumber   = $('#page-number')[0];
 var searchBox   = $('#search-box')[0];
+var searchInput   = $('#search-input')[0];
 var selectRowsNumber   = $('#select-rows_number')[0];
 
 var infoBox   = $('#info-box')[0];
@@ -263,7 +264,10 @@ function Table(tblId, columns, directionFlag) {
             
             function changeSortingDirection() {
                 // функция changeSortingDirection меняет порядок сортировки
-
+                
+                // возвращаем исходный вид строк (после ухода с блока для поиска информации)
+                setDefaultStyles();
+                
                 // получаем параметр сортировки                
                 var index = this.tdIndex;
                 
@@ -411,6 +415,9 @@ function Table(tblId, columns, directionFlag) {
     
     this.launchPage = function(data, page, pages) {
 
+        // возвращаем исходный вид строк (после ухода с блока для поиска информации)
+        setDefaultStyles();        
+        
         // заполняем новые данные
         this.fillContent(data, page);
         
@@ -568,7 +575,122 @@ function contactChoosed() {
         // показываем бокс с информацией
         displayInfoBox(true);        
     }
+}
 
+function searchActiveted() {
+    con('поле для ввода поисковой информации активировано');
+    contactMatches = [];
+    
+    var value = this.value;
+    var str;
+    
+    var min = Math.min(contacts.length, rowMax);
+    
+    for (var i = 0; i < min; i++) {
+        var row = table.rows[i + 1]; // 1 из-за учета верхней строки
+        
+        // строка - сумма значений всех ячейках td в строке row 
+        var str = row.innerText; 
+        
+        contactMatches.push({row : row, str : str, hidden : false});
+    }
+    
+    var arr = contactMatches;
+    
+//    value = 'm';
+    
+    launchSubstr(value);
+    
+
+    
+    
+}
+
+function searchMatches() {
+    var value = this.value;
+    con('запрос : ' + value);
+    launchSubstr(value);
+}
+
+function launchSubstr(substr) {
+
+    var l = contactMatches.length;
+
+    // введена непустая строка и массив строк с совпадениями не пуст
+    if (!substr) {
+        con('пустой запрос');
+        
+//        for (var i = 0; i < l; i++) {
+//            
+//            // возвращаем скрытые строки в исходное состояние
+//            if (contactMatches[i].hidden) {
+//                
+//                contactMatches[i].hidden = false;
+//                contactMatches[i].row.style.opacity = '1';
+//            }
+//        }
+        setDefaultStyles();
+        
+    } else {
+        
+        for (var i = 0; i < l; i++) {
+            
+            // индекс вхождения подсроки substr в строку contactMatches[i].str
+            var includeIndex = contactMatches[i].str.indexOf(substr);
+            
+            // нет вхождений
+            if (includeIndex == -1) {
+                
+                // скрываем строки без совпадений
+                if (!contactMatches[i].hidden) {
+                    contactMatches[i].hidden = true;
+                    contactMatches[i].row.style.opacity = '.3';
+                }   
+                
+            } else {
+                
+                // возвращаем исходное состояние
+                if (contactMatches[i].hidden) {
+                    contactMatches[i].hidden = false;
+                    contactMatches[i].row.style.opacity = '1';
+                }                 
+            }
+        }
+    }
+}
+
+function requestObtained() {
+    con('request obtained');
+}
+
+function func() {
+    con('input blured');
+    
+//    var l = contactMatches.length;
+//    
+//    for (var i = 0; i < l; i++) {
+//
+//        // возвращаем скрытые строки в исходное состояние
+//        if (contactMatches[i].hidden) {
+//
+//            contactMatches[i].hidden = false;
+//            contactMatches[i].row.style.opacity = '1';
+//        }
+//    }
+}
+
+function setDefaultStyles() {
+    var l = contactMatches.length;
+    
+    for (var i = 0; i < l; i++) {
+
+        // возвращаем скрытые строки в исходное состояние
+        if (contactMatches[i].hidden) {
+
+            contactMatches[i].hidden = false;
+            contactMatches[i].row.style.opacity = '1';
+        }
+    }    
 }
 
 // ***   ОТЛАДКА   ***
@@ -585,4 +707,11 @@ topPrev.onclick = goPrevPage;
 bottomNext.onclick = goNextPage;
 bottomPrev.onclick = goPrevPage;
 
+//searchBox.onclick = goPrevPage;
+searchInput.onclick = searchActiveted;
+//searchInput.input = searchMatches;
+
+searchInput.addEventListener('input', searchMatches);
+searchInput.addEventListener('change', func);
     
+$('#request-obtained')[0].onclick = requestObtained;
