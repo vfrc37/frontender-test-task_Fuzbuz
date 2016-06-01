@@ -651,7 +651,7 @@ function searchActiveted() {
     contactMatches = [];
     
     var value = this.value;
-    var str;
+//    var str;
     
     var cols = table.columns;
     
@@ -661,12 +661,14 @@ function searchActiveted() {
         var row = table.rows[i + 1]; // 1 из-за учета верхней строки
         
         // строка - сумма значений всех ячейках td в строке row 
-        var str = row.innerText; // лучше реализовать не через DOM, а через внутренние контактные данные
+//        var str = row.innerText; // лучше реализовать не через DOM, а через коллекцию контактов
         
-//        for (var j = 0; j < cols.length; j++) {
-//
-//            str += contacts[i][cols[j].name];                
-//        }       
+        var str = '';
+        
+        for (var j = 0; j < cols.length; j++) {
+
+            str += contacts[i][cols[j].name];                
+        }
         
         contactMatches.push({row : row, str : str, hidden : false});
     }
