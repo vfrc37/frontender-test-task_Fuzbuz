@@ -1,17 +1,33 @@
 'use strict';
 // написано с использованием IDE Brackets + Google Chrome Web Inspector (для отладки)
+// использована библиотека Jquery для работы с DOM и получения данных с сервера
 
 var useLoadingDelay = false; // использовать небольшую задержку для анимации загрузки данных ?
 var loadingDelay = 500; // loadingDelay [ms] минимальное время анимации загрузки данных
 
-var small = $('#small')[0];
-var big   = $('#big')[0];
+// объекты DOM
 var title   = $('#title')[0];
 var pageNumber   = $('#page-number')[0];
-var searchBox   = $('#search-box')[0];
-var searchInput   = $('#search-input')[0];
+
+// навигация для выбора варианта загрузки
+var small = $('#small')[0];
+var big   = $('#big')[0];
+
+// выпадающий список для выбора варианта загрузки
 var selectRowsNumber   = $('#select-rows_number')[0];
 
+// навигация по страницам
+var topNext = $('#top-next')[0];
+var topPrev = $('#top-prev')[0];
+var bottomNext = $('#bottom-next')[0];
+var bottomPrev = $('#bottom-prev')[0];
+
+// контейнер для ввода запроса от пользователя
+var searchBox   = $('#search-box')[0];
+var searchInput   = $('#search-input')[0];
+var startSearchButton   = $('#request-obtained')[0];
+
+// контейнер для вывода информации по контакту
 var infoBox   = $('#info-box')[0];
 var infoNm   = $('#info-name')[0];
 var infoDsc   = $('#info-description')[0];
@@ -20,205 +36,21 @@ var infoTwn   = $('#info-town')[0];
 var infoSt   = $('#info-state')[0];
 var infoZp   = $('#info-zip')[0];
 
-var table;
+// внутренние глобальные переменные
+var table; // таблица как будущий объект
 var url = ''; // источник данных для загрузки
 var contacts = []; // массив для хранения контактов
-var contactMatches = []; // массив контактов, информация в которых совпадает с вводом пользователя
 var propCurrent; // свойство по которому сравниваются массивы
+
 var requestValue = ''; // строка с введенным запросом
+var contactMatches = []; // массив контактов, информация в которых совпадает с вводом пользователя
 
-var columns = [];
+var columns = []; // массив столбцов (объектов)
 
-var rowMax = 50; // число отображаемых строк таблицы
-var page = 0; // номер страницы
-var pages = 0; // число страниц
-
-var topNext = $('#top-next')[0];
-var topPrev = $('#top-prev')[0];
-var bottomNext = $('#bottom-next')[0];
-var bottomPrev = $('#bottom-prev')[0];
-
-function startLoading() {
-        
-    // находим число строк таблицы для вывода
-    for (var i = 0; i < selectRowsNumber.options.length; i++) {
-        var option = selectRowsNumber.options[i];
-        if(option.selected) {
-            rowMax = +option.value;            
-        }
-    }
-    con('выбрано строк для вывода : ' + rowMax);
-    
-    // скрываем начальные элементы, используем visibility, чтобы размеры wrapper не поменялись
-    small.style.visibility = 'hidden';
-    big.style.visibility = 'hidden';
-    title.style.visibility = 'hidden';
-    selectRowsNumber.parentNode.style.visibility = 'hidden'; // скрываем всю форму
-    
-    // показываем анимацию загрузки
-    displayLoader(true);
-    con('начало загрузки данных с сервера, показ анимации');
-
-    // определяем источник загружаемых данных
-    switch (this.id) {
-
-        case 'small' :
-            url = 'http://www.filltext.com/?rows=32&id=%7Bnumber%7C1000%7D&firstName=%7BfirstName%7D&lastName=%7BlastName%7D&email=%7Bemail%7D&phone=%7Bphone%7C(xxx)xxx-xx-xx%7D&adress=%7BaddressObject%7D&description=%7Blorem%7C32%7D';
-            break;
-
-        case 'big' :
-            url = 'http://www.filltext.com/?rows=1000&id=%7Bnumber%7C1000%7D&firstName=%7BfirstName%7D&delay=3&lastName=%7BlastName%7D&email=%7Bemail%7D&phone=%7Bphone%7C(xxx)xxx-xx-xx%7D&adress=%7BaddressObject%7D&description=%7Blorem%7C32%7D';
-            break;                
-    }        
-
-    // параметры столбцов (интерфейс)
-    columns = [];        
-    columns.push(new Column('id'       , 'small-col' , ' <span>&#9650;</span>', true));
-    columns.push(new Column('firstName', 'normal-col', ' <span>&#9650;</span>', true));
-    columns.push(new Column('lastName' , 'normal-col', ' <span>&#9650;</span>', true));
-    columns.push(new Column('email'    , 'large-col' , ' <span>&#9650;</span>', true));
-    columns.push(new Column('phone'    , 'big-col'   , ' <span>&#9650;</span>', true));
-
-    // новая таблица
-    var tblId = 'table';        
-    table = new Table(tblId, columns, true);
-    table.display(false);
-
-    // создаем верхнюю строку
-    table.addNewRow('top-row smooth-hover');
-    table.rows[0].index = 0; // индекс строки как ссылка на контакт
-
-    // заполняем верхнюю строку
-    table.fillRowData(0, columns, 1);
-
-    // запрашиваем данные с сервера
-    $.getJSON(url, function(data) {
-
-        con('данные получены');
-        
-        table.createNewTable(data);
-//
-//        // парамаетры страницы
-//        page = 0;
-//        pages = Math.floor(data.length / rowMax);
-//        var rest = data.length - pages * rowMax;
-//        if (rest) pages++;
-//
-//        con('страниц в таблице : ' + pages);
-//
-//        contacts = data.slice(); // копия загруженных данных
-//
-//        // начальная сортировка коллекции
-//        propCurrent = table.columns[0].name;        
-//        sortCollection(contacts, propCurrent);
-//
-//        // sortCollection(contacts, propCurrent) сортирует только различные элементы в коллекции
-//        // одинаковые элементы остаются, как есть
-//        // для учета одинаковых элементов нужно включить расширить функцию compare(a, b), либо делать многоступенчатую сортировку (включая дополнительную сортировку по другим параметрам) - см. функцию checkSameData
-//        // в ходе отладки иногда возникало переполнение стека вызовов при использовании функции checkSameData, поэтому временно она не будет использована
-//
-////        checkSameData(table.columns, contacts, propCurrent, 0, contacts.length - 1);        
-//
-//        con('коллекцию контактов отсортирована по параметру : ' + propCurrent);
-//
-//        // создаем необходимое число строк
-//        table.createRows(Math.min(contacts.length, rowMax));
-//
-//        // выводим информацию о контактах в таблицу
-//        table.fillContent(contacts, page);
-//
-//        // скрываем анимацию загрузки
-//        con('скрываю анимацию');
-//
-//        if (useLoadingDelay) {            
-//            // вариант c минимальной задержкой
-//            setTimeout(function () {
-//                showMainPage();
-//            }, loadingDelay);
-//
-//        } else {            
-//            // вариант без минимальной задержки
-//            showMainPage();
-//        }
-//
-//        function showMainPage() {
-//            // скрываем анимацию загрузки данных
-//            displayLoader(false);
-//
-//            // скрываем элементы с начальной страницы полностью
-//            small.style.display = 'none';
-//            big.style.display = 'none';
-//            title.style.display = 'none';
-//            selectRowsNumber.parentNode.style.display = 'none';
-//
-//            // показываем таблицу и остальные элементы
-//            table.display(true);
-//            showNavigationElements(page, pages);
-//            displaySearchBox(true);
-//        }
-    });
-}
-
-function displayLoader(flag) {
-    // показать/скрыть анимацию загрузки данных
-    
-    (flag) ? $('#loader')[0].style.visibility = 'visible' : $('#loader')[0].style.visibility = '';
-//    (flag) ? $('#loader')[0].style.display = 'block' : $('#loader')[0].style.display = 'none';
-
-    // вариант с visibility работает быстрее варианта с display
-}
-
-function showNavigationElements(page, pages) {
-    
-    if (pages > 1) {
-        
-        topNext.style.display = '';
-        topPrev.style.display = '';
-        bottomNext.style.display = '';    
-        bottomPrev.style.display = '';        
-        
-        if (page == 0) {
-            // 1 страница
-            topNext.style.visibility = 'visible';
-            topPrev.style.visibility = '';
-            bottomNext.style.visibility = 'visible';    
-            bottomPrev.style.visibility = '';
-            
-        } else {
-            
-            if (page == pages - 1) {
-                // последняя страница
-                topNext.style.visibility = '';
-                topPrev.style.visibility = 'visible';
-                bottomNext.style.visibility = '';            
-                bottomPrev.style.visibility = 'visible'; 
-                
-            } else {
-                // промежуточная страница
-                topNext.style.visibility = 'visible';
-                topPrev.style.visibility = 'visible';
-                bottomNext.style.visibility = 'visible';            
-                bottomPrev.style.visibility = 'visible';                 
-            }         
-        }
-        
-        // показываем номер страницы
-        displayPageNumber(true);
-        
-    } else {
-        
-        topNext.style.display = 'none';
-        topPrev.style.display = 'none';
-        bottomNext.style.display = 'none';    
-        bottomPrev.style.display = 'none';
-        displayPageNumber(false);
-    }
-    
-    function displayPageNumber(flag) {
-        pageNumber.innerHTML = 'page : ' + (page + 1);
-        (flag) ? pageNumber.style.visibility = 'visible' : pageNumber.style.visibility = '';    
-    }
-}
+// объем выводимых данных
+var rowMax = 50; // число отображаемых строк таблицы (по-умолчанию 50, но может меняться пользователем)
+var page = 0; // номер текущей страницы
+var pages = 0; // общее число страниц
 
 // конструктор для объектов - таблица
 function Table(tblId, columns, directionFlag) {
@@ -530,10 +362,10 @@ function Table(tblId, columns, directionFlag) {
 
 // конструктор для объектов - столбцец
 function Column(name, className, txt, rise) {
-    this.name = name;
-    this.className = className;
-    this.txt = txt;
-    this.rise = rise;
+    this.name = name; // название (оно выводится в шапку таблицы)
+    this.className = className; // классы (CSS)
+    this.txt = txt;   // текст символ для отображения направления сортировки
+    this.rise = rise; // направление сортировки: по-убыванию/по-возрастанию
     
     // установка значений для исходного направления сортировки
     this.setDefaultValues = function() {
@@ -553,6 +385,133 @@ function Column(name, className, txt, rise) {
     };
 }
 
+// начало загрузки данных
+function startLoading() {
+        
+    // находим число строк таблицы для вывода
+    for (var i = 0; i < selectRowsNumber.options.length; i++) {
+        var option = selectRowsNumber.options[i];
+        if(option.selected) {
+            rowMax = +option.value;            
+        }
+    }
+    con('выбрано строк для вывода : ' + rowMax);
+    
+    // скрываем начальные элементы, используем visibility, чтобы размеры wrapper не поменялись
+    small.style.visibility = 'hidden';
+    big.style.visibility = 'hidden';
+    title.style.visibility = 'hidden';
+    selectRowsNumber.parentNode.style.visibility = 'hidden'; // скрываем всю форму
+    
+    // показываем анимацию загрузки
+    displayLoader(true);
+    con('начало загрузки данных с сервера, показ анимации');
+
+    // определяем источник загружаемых данных
+    switch (this.id) {
+
+        case 'small' :
+            url = 'http://www.filltext.com/?rows=32&id=%7Bnumber%7C1000%7D&firstName=%7BfirstName%7D&lastName=%7BlastName%7D&email=%7Bemail%7D&phone=%7Bphone%7C(xxx)xxx-xx-xx%7D&adress=%7BaddressObject%7D&description=%7Blorem%7C32%7D';
+            break;
+
+        case 'big' :
+            url = 'http://www.filltext.com/?rows=1000&id=%7Bnumber%7C1000%7D&firstName=%7BfirstName%7D&delay=3&lastName=%7BlastName%7D&email=%7Bemail%7D&phone=%7Bphone%7C(xxx)xxx-xx-xx%7D&adress=%7BaddressObject%7D&description=%7Blorem%7C32%7D';
+            break;                
+    }        
+
+    // параметры столбцов (интерфейс)
+    columns = [];        
+    columns.push(new Column('id'       , 'small-col' , ' <span>&#9650;</span>', true));
+    columns.push(new Column('firstName', 'normal-col', ' <span>&#9650;</span>', true));
+    columns.push(new Column('lastName' , 'normal-col', ' <span>&#9650;</span>', true));
+    columns.push(new Column('email'    , 'large-col' , ' <span>&#9650;</span>', true));
+    columns.push(new Column('phone'    , 'big-col'   , ' <span>&#9650;</span>', true));
+
+    // новая таблица
+    var tblId = 'table';        
+    table = new Table(tblId, columns, true);
+    table.display(false);
+
+    // создаем верхнюю строку
+    table.addNewRow('top-row smooth-hover');
+    table.rows[0].index = 0; // индекс строки как ссылка на контакт
+
+    // заполняем верхнюю строку
+    table.fillRowData(0, columns, 1);
+
+    // запрашиваем данные с сервера
+    $.getJSON(url, function(data) {
+
+        con('данные получены');
+        
+        table.createNewTable(data);
+    });
+}
+
+// показать/скрыть анимацию загрузки в зависимости от flag
+function displayLoader(flag) {
+    // показать/скрыть анимацию загрузки данных
+    
+    (flag) ? $('#loader')[0].style.visibility = 'visible' : $('#loader')[0].style.visibility = '';
+//    (flag) ? $('#loader')[0].style.display = 'block' : $('#loader')[0].style.display = 'none';
+
+    // вариант с visibility работает быстрее варианта с display
+}
+
+// показать/скрыть элементы навигации в зависимости от значений page, pages
+function showNavigationElements(page, pages) {
+    
+    if (pages > 1) {
+        
+        topNext.style.display = '';
+        topPrev.style.display = '';
+        bottomNext.style.display = '';    
+        bottomPrev.style.display = '';        
+        
+        if (page == 0) {
+            // 1 страница
+            topNext.style.visibility = 'visible';
+            topPrev.style.visibility = '';
+            bottomNext.style.visibility = 'visible';    
+            bottomPrev.style.visibility = '';
+            
+        } else {
+            
+            if (page == pages - 1) {
+                // последняя страница
+                topNext.style.visibility = '';
+                topPrev.style.visibility = 'visible';
+                bottomNext.style.visibility = '';            
+                bottomPrev.style.visibility = 'visible'; 
+                
+            } else {
+                // промежуточная страница
+                topNext.style.visibility = 'visible';
+                topPrev.style.visibility = 'visible';
+                bottomNext.style.visibility = 'visible';            
+                bottomPrev.style.visibility = 'visible';                 
+            }         
+        }
+        
+        // показываем номер страницы
+        displayPageNumber(true);
+        
+    } else {
+        
+        topNext.style.display = 'none';
+        topPrev.style.display = 'none';
+        bottomNext.style.display = 'none';    
+        bottomPrev.style.display = 'none';
+        displayPageNumber(false);
+    }
+    
+    function displayPageNumber(flag) {
+        pageNumber.innerHTML = 'page : ' + (page + 1);
+        (flag) ? pageNumber.style.visibility = 'visible' : pageNumber.style.visibility = '';    
+    }
+}
+
+// сортировка коллекции collection по свойству parameter
 function sortCollection(collection, parameter) {
 
     collection.sort(compare);
@@ -578,6 +537,7 @@ function sortCollection(collection, parameter) {
     }
 }
 
+// см. внутри
 function checkSameData(cols, collection, parameter, startIndex, endIndex) {
     
 //    var cols = table.columns; // массив столбцов (как объектов)
@@ -633,26 +593,31 @@ function checkSameData(cols, collection, parameter, startIndex, endIndex) {
     }       
 }
 
+// переход к следующей странице
 function goNextPage() {
     page++;
     table.launchPage(contacts, page, pages);
     
 }
 
+// переход к предыдущей странице
 function goPrevPage() {
     page--;
     table.launchPage(contacts, page, pages);
 }
 
+// показать/скрыть блок с информацией о контакте в зависимости от flag
 function displayInfoBox(flag) {
     (flag) ? infoBox.style.visibility = 'visible' : infoBox.style.visibility = '';
 //    (flag) ? infoBox.style.display = 'block' : infoBox.style.display = '';
 }
 
+// показать/скрыть блок для ввода поискового запроса в зависимости от flag
 function displaySearchBox(flag) {
     (flag) ? searchBox.style.visibility = 'visible' : searchBox.style.visibility = '';
 }
 
+// обработка выбора контакта при клике на строку в таблице
 function contactChoosed() {
     
     if(this.index > 0) {
@@ -680,6 +645,7 @@ function contactChoosed() {
     }
 }
 
+// обработка полей таблицы при перемещении фокуса в поле для ввода поискового запроса
 function searchActiveted() {
     con('поле для ввода поисковой информации активировано');
     contactMatches = [];
@@ -687,13 +653,20 @@ function searchActiveted() {
     var value = this.value;
     var str;
     
+    var cols = table.columns;
+    
     var min = Math.min(contacts.length, rowMax);
     
     for (var i = 0; i < min; i++) {
         var row = table.rows[i + 1]; // 1 из-за учета верхней строки
         
         // строка - сумма значений всех ячейках td в строке row 
-        var str = row.innerText; // лучше реализовать не через DOM, а через внутренние контактные данные
+//        var str = row.innerText; // лучше реализовать не через DOM, а через внутренние контактные данные
+        
+        for (var j = 0; j < cols.length; j++) {
+
+            str += contacts[i][cols[j].name];                
+        }       
         
         contactMatches.push({row : row, str : str, hidden : false});
     }
@@ -703,6 +676,7 @@ function searchActiveted() {
     launchSubstr(value);
 }
 
+// обработка полей таблицы после изменения (значения) поискового запроса
 function searchMatches() {
     var value = this.value;
     con('введен запрос : ' + value);
@@ -710,6 +684,7 @@ function searchMatches() {
     launchSubstr(value);
 }
 
+// обработка полей таблицы в результате сравнения содержимого строки с запросом пользователя requestValue
 function launchSubstr(substr) {
 
     var l = contactMatches.length;
@@ -749,6 +724,7 @@ function launchSubstr(substr) {
     }
 }
 
+// реакция на клик по кнопке Начать: анализ был ли введен запрос (если был - то дальнейшая обработка)
 function requestObtained() {
     
     requestValue = requestValue + ''; // преобразуем введенный запрос к строковому виду
@@ -757,7 +733,6 @@ function requestObtained() {
     if (requestValue) {
         // скрываем все элементы
         showNavigationElements(0, 0);    
-    //    table.table.style.visibility = 'hidden';
         table.display(false);
         displaySearchBox(false);
         
@@ -768,15 +743,16 @@ function requestObtained() {
         displayLoader(true);
         
         con('получен запрос : ' + requestValue);
-
-//        var newCollection = contacts.slice();
+        
+        // формируем новую коллекцию данных
         var newCollection = [];
         
         var cols = table.columns;
-        var rowStr = '';
+        var rowStr = ''; // переменная, содержащая данные всех ячеек в определенной строке таблицы
         
         for (var i = 0; i < contacts.length; i++) {
             
+            // сохраняем данные из таблицы через обращение к коллекции контактов (способ через row.innerText менее надежный, хотя и более быстрый)    
             rowStr = '';
             
             for (var j = 0; j < cols.length; j++) {
@@ -784,6 +760,7 @@ function requestObtained() {
                 rowStr += contacts[i][cols[j].name];                
             }
             
+            // проверяем совпадение
             if (rowStr.indexOf(requestValue) != -1) {
                 newCollection.push(contacts[i]);
             }
@@ -831,12 +808,12 @@ function requestObtained() {
     } else {
         
         con('получен пустой запрос');
-    }
-
-    
+    }    
 }
 
+// установка внешнего вида строк таблицы в исходное состояние
 function setDefaultStyles() {
+    
     var l = contactMatches.length;
     
     for (var i = 0; i < l; i++) {
@@ -850,12 +827,7 @@ function setDefaultStyles() {
     }    
 }
 
-// ***   ОТЛАДКА   ***
-// вывод информации о ходе выполнения программы
-function con(msg) {
-    console.log(msg);
-}
-
+// ***   обработка событий   ***
 small.onclick = startLoading;
 big.onclick   = startLoading;
 
@@ -864,11 +836,13 @@ topPrev.onclick = goPrevPage;
 bottomNext.onclick = goNextPage;
 bottomPrev.onclick = goPrevPage;
 
-//searchBox.onclick = goPrevPage;
 searchInput.onclick = searchActiveted;
-//searchInput.input = searchMatches;
+searchInput.oninput = searchMatches;
+//searchInput.addEventListener('input', searchMatches);
+startSearchButton.onclick = requestObtained;
 
-searchInput.addEventListener('input', searchMatches);
-//searchInput.addEventListener('change', func);
-    
-$('#request-obtained')[0].onclick = requestObtained;
+// ***   ОТЛАДКА   ***
+// вывод информации о ходе выполнения программы
+function con(msg) {
+    console.log(msg);
+}
