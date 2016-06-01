@@ -24,6 +24,7 @@ var url = ''; // источник данных для загрузки
 var contacts = []; // массив для хранения контактов
 var contactMatches = []; // массив контактов, информация в которых совпадает с вводом пользователя
 var propCurrent; // свойство по которому сравниваются массивы
+var requestValue = ''; // строка с введенным запросом
 
 var rowMax = 50; // число отображаемых строк таблицы
 var page = 0; // номер страницы
@@ -45,11 +46,11 @@ function startLoading() {
     }
     con('выбрано строк для вывода : ' + rowMax);
     
-    // скрываем начальные элементы
-    small.style.display = 'none';
-    big.style.display = 'none';
-    title.style.display = 'none';
-    selectRowsNumber.parentNode.style.display = 'none'; // скрываем всю форму
+    // скрываем начальные элементы, используем visibility, чтобы размеры wrapper не поменялись
+    small.style.visibility = 'hidden';
+    big.style.visibility = 'hidden';
+    title.style.visibility = 'hidden';
+    selectRowsNumber.parentNode.style.visibility = 'hidden'; // скрываем всю форму
     
     // показываем анимацию загрузки
     displayLoader(true);
@@ -92,54 +93,66 @@ function startLoading() {
 
         con('данные получены');
         
-        // парамаетры страницы
-        page = 0;
-        pages = Math.floor(data.length / rowMax);
-        var rest = data.length - pages * rowMax;
-        if (rest) pages++;
-        
-        con('страниц в таблице : ' + pages);
-        
-        contacts = data.slice(); // копия загруженных данных
-        
-        // начальная сортировка коллекции
-        propCurrent = table.columns[0].name;        
-        sortCollection(contacts, propCurrent);
-        
-        // sortCollection(contacts, propCurrent) сортирует только различные элементы в коллекции
-        // одинаковые элементы остаются, как есть
-        // для учета одинаковых элементов нужно включить расширить функцию compare(a, b), либо делать многоступенчатую сортировку (включая дополнительную сортировку по другим параметрам) - см. функцию checkSameData
-        // в ходе отладки иногда возникало переполнение стека вызовов при использовании функции checkSameData, поэтому временно она не будет использована
-        
-//        checkSameData(table.columns, contacts, propCurrent, 0, contacts.length - 1);        
-        
-        con('коллекцию контактов отсортирована по параметру : ' + propCurrent);
-                
-        // создаем необходимое число строк
-        table.createRows(Math.min(contacts.length, rowMax));
-        
-        // выводим информацию о контактах в таблицу
-        table.fillContent(contacts, page);
-
-        // скрываем анимацию загрузки
-        con('скрываю анимацию');
-        
-        if (useLoadingDelay) {            
-            // вариант c минимальной задержкой
-            setTimeout(function () {
-                displayLoader(false);
-                table.display(true);
-                showNavigationElements(page, pages);
-                displaySearchBox(true);
-            }, loadingDelay);
-            
-        } else {            
-            // вариант без минимальной задержки
-            displayLoader(false); 
-            table.display(true);
-            showNavigationElements(page, pages);
-            displaySearchBox(true);
-        }
+        table.createNewTable(data);
+//
+//        // парамаетры страницы
+//        page = 0;
+//        pages = Math.floor(data.length / rowMax);
+//        var rest = data.length - pages * rowMax;
+//        if (rest) pages++;
+//
+//        con('страниц в таблице : ' + pages);
+//
+//        contacts = data.slice(); // копия загруженных данных
+//
+//        // начальная сортировка коллекции
+//        propCurrent = table.columns[0].name;        
+//        sortCollection(contacts, propCurrent);
+//
+//        // sortCollection(contacts, propCurrent) сортирует только различные элементы в коллекции
+//        // одинаковые элементы остаются, как есть
+//        // для учета одинаковых элементов нужно включить расширить функцию compare(a, b), либо делать многоступенчатую сортировку (включая дополнительную сортировку по другим параметрам) - см. функцию checkSameData
+//        // в ходе отладки иногда возникало переполнение стека вызовов при использовании функции checkSameData, поэтому временно она не будет использована
+//
+////        checkSameData(table.columns, contacts, propCurrent, 0, contacts.length - 1);        
+//
+//        con('коллекцию контактов отсортирована по параметру : ' + propCurrent);
+//
+//        // создаем необходимое число строк
+//        table.createRows(Math.min(contacts.length, rowMax));
+//
+//        // выводим информацию о контактах в таблицу
+//        table.fillContent(contacts, page);
+//
+//        // скрываем анимацию загрузки
+//        con('скрываю анимацию');
+//
+//        if (useLoadingDelay) {            
+//            // вариант c минимальной задержкой
+//            setTimeout(function () {
+//                showMainPage();
+//            }, loadingDelay);
+//
+//        } else {            
+//            // вариант без минимальной задержки
+//            showMainPage();
+//        }
+//
+//        function showMainPage() {
+//            // скрываем анимацию загрузки данных
+//            displayLoader(false);
+//
+//            // скрываем элементы с начальной страницы полностью
+//            small.style.display = 'none';
+//            big.style.display = 'none';
+//            title.style.display = 'none';
+//            selectRowsNumber.parentNode.style.display = 'none';
+//
+//            // показываем таблицу и остальные элементы
+//            table.display(true);
+//            showNavigationElements(page, pages);
+//            displaySearchBox(true);
+//        }
     });
 }
 
@@ -155,6 +168,11 @@ function displayLoader(flag) {
 function showNavigationElements(page, pages) {
     
     if (pages > 1) {
+        
+        topNext.style.display = '';
+        topPrev.style.display = '';
+        bottomNext.style.display = '';    
+        bottomPrev.style.display = '';        
         
         if (page == 0) {
             // 1 страница
@@ -214,7 +232,69 @@ function Table(tblId, columns, directionFlag) {
     
     // показать/скрыть таблицу по значению flag
     this.display = function(flag) {
+//        (flag) ? this.table.style.visibility = 'visible' : this.table.style.visibility = '';
         (flag) ? this.table.style.display = 'block' : this.table.style.display = 'none';
+    };
+    
+    this.createNewTable = function(data) {
+        // парамаетры страницы
+        page = 0;
+        pages = Math.floor(data.length / rowMax);
+        var rest = data.length - pages * rowMax;
+        if (rest) pages++;
+
+        con('страниц в таблице : ' + pages);
+
+        contacts = data.slice(); // копия загруженных данных
+
+        // начальная сортировка коллекции
+        propCurrent = table.columns[0].name;        
+        sortCollection(contacts, propCurrent);
+
+        // sortCollection(contacts, propCurrent) сортирует только различные элементы в коллекции
+        // одинаковые элементы остаются, как есть
+        // для учета одинаковых элементов нужно включить расширить функцию compare(a, b), либо делать многоступенчатую сортировку (включая дополнительную сортировку по другим параметрам) - см. функцию checkSameData
+        // в ходе отладки иногда возникало переполнение стека вызовов при использовании функции checkSameData, поэтому временно она не будет использована
+
+    //        checkSameData(table.columns, contacts, propCurrent, 0, contacts.length - 1);        
+
+        con('коллекцию контактов отсортирована по параметру : ' + propCurrent);
+
+        // создаем необходимое число строк
+        table.createRows(Math.min(contacts.length, rowMax));
+
+        // выводим информацию о контактах в таблицу
+        table.fillContent(contacts, page);
+
+        // скрываем анимацию загрузки
+        con('скрываю анимацию');
+
+        if (useLoadingDelay) {            
+            // вариант c минимальной задержкой
+            setTimeout(function () {
+                showMainPage();
+            }, loadingDelay);
+
+        } else {            
+            // вариант без минимальной задержки
+            showMainPage();
+        }
+
+        function showMainPage() {
+            // скрываем анимацию загрузки данных
+            displayLoader(false);
+
+            // скрываем элементы с начальной страницы полностью
+            small.style.display = 'none';
+            big.style.display = 'none';
+            title.style.display = 'none';
+            selectRowsNumber.parentNode.style.display = 'none';
+
+            // показываем таблицу и остальные элементы
+            table.display(true);
+            showNavigationElements(page, pages);
+            displaySearchBox(true);
+        }         
     };
     
     // добавление строки с классом rowClassName
@@ -544,6 +624,7 @@ function goPrevPage() {
 
 function displayInfoBox(flag) {
     (flag) ? infoBox.style.visibility = 'visible' : infoBox.style.visibility = '';
+//    (flag) ? infoBox.style.display = 'block' : infoBox.style.display = '';
 }
 
 function displaySearchBox(flag) {
@@ -590,25 +671,20 @@ function searchActiveted() {
         var row = table.rows[i + 1]; // 1 из-за учета верхней строки
         
         // строка - сумма значений всех ячейках td в строке row 
-        var str = row.innerText; 
+        var str = row.innerText; // лучше реализовать не через DOM, а через внутренние контактные данные
         
         contactMatches.push({row : row, str : str, hidden : false});
     }
     
     var arr = contactMatches;
     
-//    value = 'm';
-    
     launchSubstr(value);
-    
-
-    
-    
 }
 
 function searchMatches() {
     var value = this.value;
-    con('запрос : ' + value);
+    con('введен запрос : ' + value);
+    requestValue = this.value; // сохраняем введенный запрос в глобальную переменную
     launchSubstr(value);
 }
 
@@ -618,17 +694,9 @@ function launchSubstr(substr) {
 
     // введена непустая строка и массив строк с совпадениями не пуст
     if (!substr) {
-        con('пустой запрос');
+        con('запрос пуст');
         
-//        for (var i = 0; i < l; i++) {
-//            
-//            // возвращаем скрытые строки в исходное состояние
-//            if (contactMatches[i].hidden) {
-//                
-//                contactMatches[i].hidden = false;
-//                contactMatches[i].row.style.opacity = '1';
-//            }
-//        }
+        // сбрасываем стили строк в исходное состояние
         setDefaultStyles();
         
     } else {
@@ -660,11 +728,131 @@ function launchSubstr(substr) {
 }
 
 function requestObtained() {
-    con('request obtained');
+    
+    requestValue = requestValue + ''; // преобразуем введенный запрос к строковому виду
+    
+    // что-то было введено
+    if (requestValue) {
+        // скрываем все элементы
+        showNavigationElements(0, 0);    
+    //    table.table.style.visibility = 'hidden';
+        table.display(false);
+        displaySearchBox(false);
+
+        // показываем анимацию загрузки
+        displayLoader(true);
+        
+        con('получен запрос : ' + requestValue);
+
+//        var newCollection = contacts.slice();
+        var newCollection = [];
+        
+        var cols = table.columns;
+        var rowStr = '';
+        
+        for (var i = 0; i < contacts.length; i++) {
+            
+            rowStr = '';
+            
+            for (var j = 0; j < cols.length; j++) {
+                
+                rowStr += contacts[i][cols[j].name];                
+            }
+            
+            if (rowStr.indexOf(requestValue) != -1) {
+                newCollection.push(contacts[i]);
+            }
+            
+        }
+        
+        if (newCollection.length) {
+            // формируем новую таблицу
+        } else {
+            displayLoader(false);
+            
+            // скрываем элементы с начальной страницы полностью
+//            small.style.display = 'none';
+//            big.style.display = 'none';
+//            title.style.display = 'none';
+//            selectRowsNumber.parentNode.style.display = 'none';
+            
+            // показываем таблицу и остальные элементы
+            table.display(true);
+            showNavigationElements(page, pages);
+            displaySearchBox(true);
+        }
+        
+    } else {
+        con('получен пустой запрос');
+    }
+
+    
 }
 
-function func() {
-    con('input blured');
+//function createNewTable(data) {
+//
+//    // парамаетры страницы
+//    page = 0;
+//    pages = Math.floor(data.length / rowMax);
+//    var rest = data.length - pages * rowMax;
+//    if (rest) pages++;
+//
+//    con('страниц в таблице : ' + pages);
+//
+//    contacts = data.slice(); // копия загруженных данных
+//
+//    // начальная сортировка коллекции
+//    propCurrent = table.columns[0].name;        
+//    sortCollection(contacts, propCurrent);
+//
+//    // sortCollection(contacts, propCurrent) сортирует только различные элементы в коллекции
+//    // одинаковые элементы остаются, как есть
+//    // для учета одинаковых элементов нужно включить расширить функцию compare(a, b), либо делать многоступенчатую сортировку (включая дополнительную сортировку по другим параметрам) - см. функцию checkSameData
+//    // в ходе отладки иногда возникало переполнение стека вызовов при использовании функции checkSameData, поэтому временно она не будет использована
+//
+////        checkSameData(table.columns, contacts, propCurrent, 0, contacts.length - 1);        
+//
+//    con('коллекцию контактов отсортирована по параметру : ' + propCurrent);
+//
+//    // создаем необходимое число строк
+//    table.createRows(Math.min(contacts.length, rowMax));
+//
+//    // выводим информацию о контактах в таблицу
+//    table.fillContent(contacts, page);
+//
+//    // скрываем анимацию загрузки
+//    con('скрываю анимацию');
+//
+//    if (useLoadingDelay) {            
+//        // вариант c минимальной задержкой
+//        setTimeout(function () {
+//            showMainPage();
+//        }, loadingDelay);
+//
+//    } else {            
+//        // вариант без минимальной задержки
+//        showMainPage();
+//    }
+//
+//    function showMainPage() {
+//        // скрываем анимацию загрузки данных
+//        displayLoader(false);
+//
+//        // скрываем элементы с начальной страницы полностью
+//        small.style.display = 'none';
+//        big.style.display = 'none';
+//        title.style.display = 'none';
+//        selectRowsNumber.parentNode.style.display = 'none';
+//
+//        // показываем таблицу и остальные элементы
+//        table.display(true);
+//        showNavigationElements(page, pages);
+//        displaySearchBox(true);
+//    }    
+//}
+
+//function func() {
+//    con('input blured');
     
 //    var l = contactMatches.length;
 //    
@@ -677,7 +865,7 @@ function func() {
 //            contactMatches[i].row.style.opacity = '1';
 //        }
 //    }
-}
+//}
 
 function setDefaultStyles() {
     var l = contactMatches.length;
@@ -712,6 +900,6 @@ searchInput.onclick = searchActiveted;
 //searchInput.input = searchMatches;
 
 searchInput.addEventListener('input', searchMatches);
-searchInput.addEventListener('change', func);
+//searchInput.addEventListener('change', func);
     
 $('#request-obtained')[0].onclick = requestObtained;
