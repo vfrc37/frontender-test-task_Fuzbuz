@@ -97,24 +97,48 @@
         }
         
         #search-box {
+            display: table;
             visibility: hidden;
             font-size: 26px;
             line-height: 30px;
-/*            width: 300px;*/
+            height: 50px;
             margin: 0 auto;
+/*            border: 1px solid #000;*/
+            vertical-align: middle;
         }
         
+        #search-box p {
+            line-height: 50px;
+        }
+        
+        
         #search-box input {
-            font-size: 30px;
+            font-size: 23px;
             border: 1px solid #000;
-            width: 200px;
-/*            height: 30px;*/
-/*            line-height: 30px;*/
+            width: 300px;
+            height: 50px;
             padding: 5px 10px;
+            margin: 0;
             margin-left: 20px;
         }
         
-        #search-box p, #search-box input {display: inline-block;}
+        #request-obtained {
+            font-size: 20px;
+            width: 40px;
+            height: 50px;
+            line-height: 50px;
+            border: 1px solid #000;
+            padding: 0 30px;
+            cursor: pointer;
+            background-color: #CEDBFF;
+            border-left-width: 0;
+        }
+        
+        #request-obtained:hover {
+            background-color: #a9c0ff;
+        }
+        
+        #search-box p, #search-box input, #request-obtained {display: table-cell;}
         
         #table {
             display: none;
@@ -188,6 +212,7 @@
             visibility: hidden;
             display: inline-block;
             margin: 20px;
+            margin-bottom: 0;
 /*            padding: 10px;*/
             border: 1px solid #000;
             font-size: 50px;
@@ -243,7 +268,7 @@
         
         <!--   текстовое поле для поиска   -->
         <div id="search-box">
-            <p>Поиск: </p><input type="text" value="">    
+            <p>Поиск: </p><input type="text" value="" id='search-input'><div id="request-obtained" class='smooth-hover'>Найти</div>
         </div>
         
         <!--   верхняя навигация   -->
