@@ -11,6 +11,10 @@
 /*            box-sizing: border-box;*/
         }
         
+        body {
+            background-color: #8b8b8b;
+        }
+        
         #wrapper {
             font-size: 0;
             position: relative;
@@ -21,7 +25,9 @@
 /*            margin-top: -400px;*/
             margin-left: -400px;
             padding: 20px 0;
-            border: 1px solid #000;
+/*            border: 1px solid #373C48;*/
+            background-color: #ffffff;
+            border-radius: 20px;
             text-align: center;
         }
         
@@ -45,11 +51,11 @@
 /*            display: none;*/
             visibility: hidden;
             position: absolute;
-            top: 50%;
+            top: 300px;
             left: 50%;
             height: 150px;
             width: 150px;
-            margin-top: -75px;
+/*            margin-top: -75px;*/
             margin-left: -75px;
 /*            border: 1px solid #000;*/
             border-radius: 75px;
@@ -81,9 +87,10 @@
             margin: 20px auto;
             font-size: 28px;
             line-height: 40px;
-            border: 1px solid #000;
+            border: 1px solid #373C48;
             padding: 20px;
             text-align: left;
+/*            display: none;*/
             visibility: hidden;
         }
         
@@ -114,7 +121,7 @@
         
         #search-box input {
             font-size: 23px;
-            border: 1px solid #000;
+            border: 1px solid #373C48;
             width: 300px;
             height: 50px;
             padding: 5px 10px;
@@ -127,7 +134,7 @@
             width: 40px;
             height: 50px;
             line-height: 50px;
-            border: 1px solid #000;
+            border: 1px solid #373C48;
             padding: 0 30px;
             cursor: pointer;
             background-color: #CEDBFF;
@@ -142,10 +149,11 @@
         
         #table {
             display: none;
+/*            visibility: hidden;*/
 /*            height: 400px;*/
 /*            width: 700px;*/
             margin: 20px auto;
-            border: 1px solid #000;
+            border: 1px solid #373C48;
             box-sizing: border-box;
         }
         
@@ -183,7 +191,7 @@
 /*            cursor: pointer;*/
         }
         tr.top-row td:hover {
-            background-color: #a9c0ff;
+            background-color: #8BAAFF;
         }
         
         tr.top-row:hover td {
@@ -214,17 +222,18 @@
             margin: 20px;
             margin-bottom: 0;
 /*            padding: 10px;*/
-            border: 1px solid #000;
+            border: 1px solid #373C48;
             font-size: 50px;
             width: 100px;
             height: 50px;
             line-height: 50px;
             border-radius: 20px;
             cursor: pointer;
+            background-color: #CEDBFF;
         }
 /*        button {background-color: #dbdbdb;}*/
         :focus {outline: none;}
-        div.nav-buttons:hover {background-color: #8d8d8d;}
+        div.nav-buttons:hover {background-color: #8BAAFF;}
         
         .smooth-hover, tr.smooth-hover td {
             transition: background-color .3s;
@@ -236,7 +245,7 @@
     
     <script type="text/javascript" src="jquery-1.12.0.min.js"></script>
 </head>
-<body>
+<body>  
     <div id="wrapper">
         <div id="loader"><!--    taken from http://cssload.net#sthash.iNaN8lKs.dpuf-->        
             <div id="floatingBarsG">
