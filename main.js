@@ -7,6 +7,7 @@ var small = $('#small')[0];
 var big   = $('#big')[0];
 var title   = $('#title')[0];
 var pageNumber   = $('#page-number')[0];
+var searchBox   = $('#search-box')[0];
 var selectRowsNumber   = $('#select-rows_number')[0];
 
 var infoBox   = $('#info-box')[0];
@@ -20,6 +21,7 @@ var infoZp   = $('#info-zip')[0];
 var table;
 var url = ''; // источник данных для загрузки
 var contacts = []; // массив для хранения контактов
+var contactMatches = []; // массив контактов, информация в которых совпадает с вводом пользователя
 var propCurrent; // свойство по которому сравниваются массивы
 
 var rowMax = 50; // число отображаемых строк таблицы
@@ -127,6 +129,7 @@ function startLoading() {
                 displayLoader(false);
                 table.display(true);
                 showNavigationElements(page, pages);
+                displaySearchBox(true);
             }, loadingDelay);
             
         } else {            
@@ -134,6 +137,7 @@ function startLoading() {
             displayLoader(false); 
             table.display(true);
             showNavigationElements(page, pages);
+            displaySearchBox(true);
         }
     });
 }
@@ -532,7 +536,11 @@ function goPrevPage() {
 }
 
 function displayInfoBox(flag) {
-    (flag) ? infoBox.style.visibility = 'visible' : infoBox.style.visibility = '';    
+    (flag) ? infoBox.style.visibility = 'visible' : infoBox.style.visibility = '';
+}
+
+function displaySearchBox(flag) {
+    (flag) ? searchBox.style.visibility = 'visible' : searchBox.style.visibility = '';
 }
 
 function contactChoosed() {
