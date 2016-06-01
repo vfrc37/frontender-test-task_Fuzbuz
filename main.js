@@ -1,4 +1,5 @@
 'use strict';
+// написано с использованием IDE Brackets + Google Chrome Web Inspector (для отладки)
 
 var useLoadingDelay = false; // использовать небольшую задержку для анимации загрузки данных ?
 var loadingDelay = 500; // loadingDelay [ms] минимальное время анимации загрузки данных
