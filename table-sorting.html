@@ -96,6 +96,26 @@
             width: 260px;
         }
         
+        #search-box {
+            visibility: hidden;
+            font-size: 26px;
+            line-height: 30px;
+/*            width: 300px;*/
+            margin: 0 auto;
+        }
+        
+        #search-box input {
+            font-size: 30px;
+            border: 1px solid #000;
+            width: 200px;
+/*            height: 30px;*/
+/*            line-height: 30px;*/
+            padding: 5px 10px;
+            margin-left: 20px;
+        }
+        
+        #search-box p, #search-box input {display: inline-block;}
+        
         #table {
             display: none;
 /*            height: 400px;*/
@@ -178,7 +198,7 @@
             cursor: pointer;
         }
 /*        button {background-color: #dbdbdb;}*/
-        button:focus, select:focus {outline: none;}
+        :focus {outline: none;}
         div.nav-buttons:hover {background-color: #8d8d8d;}
         
         .smooth-hover, tr.smooth-hover td {
@@ -220,6 +240,11 @@
                 <option value="10">10</option>
             </select>
         </form>
+        
+        <!--   текстовое поле для поиска   -->
+        <div id="search-box">
+            <p>Поиск: </p><input type="text" value="">    
+        </div>
         
         <!--   верхняя навигация   -->
         <div id="top-prev" class='nav-buttons smooth-hover'>&#9665;</div>
