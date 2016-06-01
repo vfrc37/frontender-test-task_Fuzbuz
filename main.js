@@ -1,9 +1,12 @@
 'use strict';
 // написано с использованием IDE Brackets + Google Chrome Web Inspector (для отладки)
 // использована библиотека Jquery для работы с DOM и получения данных с сервера
+// протестировано в браузерах : Chrome, FF, Opera
+// в IE пока не работает (причина - ошибка при загрузке данных; подробнее - см. функцию startLoading() )
 
 var useLoadingDelay = false; // использовать небольшую задержку для анимации загрузки данных ?
 var loadingDelay = 500; // loadingDelay [ms] минимальное время анимации загрузки данных
+var ieSupport = false; // поддержка IE (загрузка через метод .getJSON не работает в IE, работает .ajax)
 
 // объекты DOM
 var title   = $('#title')[0];
@@ -438,14 +441,35 @@ function startLoading() {
 
     // заполняем верхнюю строку
     table.fillRowData(0, columns, 1);
-
-    // запрашиваем данные с сервера
-    $.getJSON(url, function(data) {
-
-        con('данные получены');
+    
+    // запрашиваем данные с сервера: для всех браузеров кроме IE используем .getJSON, для IE используем .ajax
+    if (ieSupport) {
         
-        table.createNewTable(data);
-    });
+        $.ajax({
+              url: url,
+              cache: false,
+              dataType: "json",
+              success: function(data) {
+
+                  con('данные получены');
+                  table.createNewTable(data);
+
+              },
+              error: function (request, status, error) {
+                  // обработка ошибок
+                  con(status + ", " + error);
+              }
+            });
+        
+    } else {
+        
+        $.getJSON(url, function(data) {
+
+            con('данные получены');
+
+            table.createNewTable(data);
+        });        
+    }
 }
 
 // показать/скрыть анимацию загрузки в зависимости от flag
