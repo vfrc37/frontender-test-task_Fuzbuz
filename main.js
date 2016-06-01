@@ -26,6 +26,8 @@ var contactMatches = []; // массив контактов, информаци�
 var propCurrent; // свойство по которому сравниваются массивы
 var requestValue = ''; // строка с введенным запросом
 
+var columns = [];
+
 var rowMax = 50; // число отображаемых строк таблицы
 var page = 0; // номер страницы
 var pages = 0; // число страниц
@@ -69,7 +71,7 @@ function startLoading() {
     }        
 
     // параметры столбцов (интерфейс)
-    var columns = [];        
+    columns = [];        
     columns.push(new Column('id'       , 'small-col' , ' <span>&#9650;</span>', true));
     columns.push(new Column('firstName', 'normal-col', ' <span>&#9650;</span>', true));
     columns.push(new Column('lastName' , 'normal-col', ' <span>&#9650;</span>', true));
@@ -236,6 +238,19 @@ function Table(tblId, columns, directionFlag) {
         (flag) ? this.table.style.display = 'block' : this.table.style.display = 'none';
     };
     
+    // удаление строк
+    this.deleteRows = function() {
+        
+        var rows = this.rows;
+        
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].parentNode.removeChild(rows[i]);
+        }
+        
+        this.rows = []; // массив строк
+    };
+    
+    // создание новой таблицы
     this.createNewTable = function(data) {
         // парамаетры страницы
         page = 0;
@@ -328,6 +343,12 @@ function Table(tblId, columns, directionFlag) {
         
         var self = this;
         var row = this.rows[rowIndex];
+        
+        if (!row) {
+            table;
+            contacts;
+            con('error');
+        }
         var cells = row.getElementsByTagName('td');        
                 
         // заполнение верхней строки
@@ -738,6 +759,9 @@ function requestObtained() {
     //    table.table.style.visibility = 'hidden';
         table.display(false);
         displaySearchBox(false);
+        
+        // скрываем окно информации о контакте
+        displayInfoBox(false);
 
         // показываем анимацию загрузки
         displayLoader(true);
@@ -766,7 +790,29 @@ function requestObtained() {
         }
         
         if (newCollection.length) {
+            
+            table.deleteRows();
+            table.directionFlag = true;
+            
+            // создаем верхнюю строку
+            table.addNewRow('top-row smooth-hover');
+            table.rows[0].index = 0; // индекс строки как ссылка на контакт
+
+            // заполняем верхнюю строку
+            table.fillRowData(0, columns, 1);
+            
             // формируем новую таблицу
+            table.createNewTable(newCollection);
+            
+            // скрываем анимацию загрузки
+            displayLoader(false);            
+            
+            // показываем все элементы
+            showNavigationElements(page, pages);    
+        //    table.table.style.visibility = 'hidden';
+            table.display(true);
+            displaySearchBox(true);
+            
         } else {
             displayLoader(false);
             
