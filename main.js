@@ -791,13 +791,14 @@ function requestObtained() {
         
         if (newCollection.length) {
             
+            // заносим в таблицу новые данные
+            // удаляем строки
             table.deleteRows();
-            table.directionFlag = true;
-            
+            // направдение сортировки - по-возрастанию
+            table.directionFlag = true;            
             // создаем верхнюю строку
             table.addNewRow('top-row smooth-hover');
             table.rows[0].index = 0; // индекс строки как ссылка на контакт
-
             // заполняем верхнюю строку
             table.fillRowData(0, columns, 1);
             
@@ -809,18 +810,16 @@ function requestObtained() {
             
             // показываем все элементы
             showNavigationElements(page, pages);    
-        //    table.table.style.visibility = 'hidden';
             table.display(true);
             displaySearchBox(true);
             
-        } else {
-            displayLoader(false);
+        } else {            
             
-            // скрываем элементы с начальной страницы полностью
-//            small.style.display = 'none';
-//            big.style.display = 'none';
-//            title.style.display = 'none';
-//            selectRowsNumber.parentNode.style.display = 'none';
+            // возращаем исходные стили
+            setDefaultStyles();
+            
+            // скрываем анимацию загрузки
+            displayLoader(false);           
             
             // показываем таблицу и остальные элементы
             table.display(true);
@@ -829,89 +828,12 @@ function requestObtained() {
         }
         
     } else {
+        
         con('получен пустой запрос');
     }
 
     
 }
-
-//function createNewTable(data) {
-//
-//    // парамаетры страницы
-//    page = 0;
-//    pages = Math.floor(data.length / rowMax);
-//    var rest = data.length - pages * rowMax;
-//    if (rest) pages++;
-//
-//    con('страниц в таблице : ' + pages);
-//
-//    contacts = data.slice(); // копия загруженных данных
-//
-//    // начальная сортировка коллекции
-//    propCurrent = table.columns[0].name;        
-//    sortCollection(contacts, propCurrent);
-//
-//    // sortCollection(contacts, propCurrent) сортирует только различные элементы в коллекции
-//    // одинаковые элементы остаются, как есть
-//    // для учета одинаковых элементов нужно включить расширить функцию compare(a, b), либо делать многоступенчатую сортировку (включая дополнительную сортировку по другим параметрам) - см. функцию checkSameData
-//    // в ходе отладки иногда возникало переполнение стека вызовов при использовании функции checkSameData, поэтому временно она не будет использована
-//
-////        checkSameData(table.columns, contacts, propCurrent, 0, contacts.length - 1);        
-//
-//    con('коллекцию контактов отсортирована по параметру : ' + propCurrent);
-//
-//    // создаем необходимое число строк
-//    table.createRows(Math.min(contacts.length, rowMax));
-//
-//    // выводим информацию о контактах в таблицу
-//    table.fillContent(contacts, page);
-//
-//    // скрываем анимацию загрузки
-//    con('скрываю анимацию');
-//
-//    if (useLoadingDelay) {            
-//        // вариант c минимальной задержкой
-//        setTimeout(function () {
-//            showMainPage();
-//        }, loadingDelay);
-//
-//    } else {            
-//        // вариант без минимальной задержки
-//        showMainPage();
-//    }
-//
-//    function showMainPage() {
-//        // скрываем анимацию загрузки данных
-//        displayLoader(false);
-//
-//        // скрываем элементы с начальной страницы полностью
-//        small.style.display = 'none';
-//        big.style.display = 'none';
-//        title.style.display = 'none';
-//        selectRowsNumber.parentNode.style.display = 'none';
-//
-//        // показываем таблицу и остальные элементы
-//        table.display(true);
-//        showNavigationElements(page, pages);
-//        displaySearchBox(true);
-//    }    
-//}
-
-//function func() {
-//    con('input blured');
-    
-//    var l = contactMatches.length;
-//    
-//    for (var i = 0; i < l; i++) {
-//
-//        // возвращаем скрытые строки в исходное состояние
-//        if (contactMatches[i].hidden) {
-//
-//            contactMatches[i].hidden = false;
-//            contactMatches[i].row.style.opacity = '1';
-//        }
-//    }
-//}
 
 function setDefaultStyles() {
     var l = contactMatches.length;
