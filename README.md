@@ -15,13 +15,11 @@ https://github.com/frontdevops/frontend-javascript-test
 
 solution needs following files to run :
 
-    table-sorting.html, 
-    main.css, 
-    loader.css, 
-    main.js, 
+    table-sorting.html 
+    main.css 
+    loader.css 
+    main.js 
     jquery-1.12.0.min.js
 
-or one file :
-    
-    index.html
+or one file (index.html) :
 https://github.com/vfrc37/frontender-test-task_Fuzbuz/blob/master/index.html
